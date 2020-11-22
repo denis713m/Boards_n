@@ -1,0 +1,29 @@
+.mainContainer
+    display: flex
+    justify-content: center
+    flex-direction: column
+    margin: 20px 0 10px
+    font-family: Gotham
+.fieldContainer
+    width: fill
+    height: 80px
+    margin: 0 10px 15px 10px
+    padding: 10px
+    font-size: 22px
+    text-align: center
+    border: none
+    border-radius: 5px
+    outline: none
+    &::placeholder 
+        color: #D3D3D3     
+.button
+    @extend .fieldContainer
+    margin: 10px 20px
+    font-size: 28px
+    background-color: #28d2d0
+    color: #ffffff
+    cursor: pointer
+    &:hover              
+        color: #28d2d0
+        background-color: #ffffff
+

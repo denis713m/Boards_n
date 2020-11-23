@@ -24,12 +24,10 @@ export function* registrationUser(action) {
     yield put({type: types.REGISTRATION_USER_REQUEST});
     try{
         const {data} = yield  loginRequest(action.data.values);
-        console.log(action);
         action.data.history.replace('/');
         yield put({type: types.REGISTRATION_USER_SUCCESS, data:data});
     }
     catch (e) {
-        console.log(e);
         yield put({type: types.REGISTRATION_USER_ERROR, error: e.response});
     }
  }
@@ -37,12 +35,10 @@ export function* registrationUser(action) {
  export function* getUser(action) {
     yield put({type: types.REGISTRATION_USER_REQUEST});
     try{
-        console.log('getUser');
         const {data} = yield  getUserRequest();
         yield put({type: types.REGISTRATION_USER_SUCCESS, data:data});
     }
     catch (e) {
-
         yield put({type: types.REGISTRATION_USER_ERROR, error: e.response});
     }
  }

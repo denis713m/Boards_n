@@ -9,7 +9,6 @@ const initialState = {
   export default function(state = initialState, action) {
     switch (action.type) {
       case types.REGISTRATION_USER_REQUEST:{
-        console.log('request');
         state.isFetching = true;
         return {...state}
       }
@@ -23,7 +22,6 @@ const initialState = {
         }
       }
       case types.REGISTRATION_USER_ERROR:{
-        console.log('error');
         return {
           ...state,
           isFetching: false,
@@ -32,7 +30,6 @@ const initialState = {
         }
       }
       case types.LOG_OUT:{
-        console.log('log_out');
         window.localStorage.removeItem('accessToken');
         return {
           ...state,

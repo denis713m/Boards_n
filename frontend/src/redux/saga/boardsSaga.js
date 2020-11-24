@@ -40,7 +40,6 @@ export function* createBoards(action) {
             if (element.id === action.data) board=element;
         })
         if(!board) throw new Error('Board_absend');
-        console.log(board);
         yield put({type: types.GET_BOARD_BY_ID_SUCCESS, data:board});
     }
     catch (e) {

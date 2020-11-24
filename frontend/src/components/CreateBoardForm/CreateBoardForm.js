@@ -6,7 +6,6 @@ import Schems from '../../validators/YupValidator';
 import styles from './CreateBoardForm.module.sass';
 
 const CreateBoardForm = (props) => {
-    console.log(props);
     return (
         <div className={styles.overlay}>
             <form onSubmit={props.handleSubmit} className={styles.container}>

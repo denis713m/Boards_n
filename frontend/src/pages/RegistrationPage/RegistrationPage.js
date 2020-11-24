@@ -8,9 +8,7 @@ import styles from './RegistrationPage.module.sass';
 import {registerUser} from '../../redux/actions';
 
 const RegistrationPage = (props) => {
-    console.log(styles)
     const submit = values => {
-        console.log(values);
         props.register({values:values, history:props.history});
       }     
   

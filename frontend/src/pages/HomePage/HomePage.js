@@ -24,7 +24,6 @@ const HomePage = (props) => {
     }
 
     const handleSubmit = values => {
-        console.log(values);
         props.createBoard({name:values.name,
                             user:props.user.userId})
         closeCreationPanel();
@@ -45,7 +44,6 @@ const HomePage = (props) => {
     return (
         <>
             <Header/>
-            {console.log(props.boards)}
             <div className={styles.container}>
                 <div className={styles.containerHeader}>
                     <Icon path={mdiAccountOutline}

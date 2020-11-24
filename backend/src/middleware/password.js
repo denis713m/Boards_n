@@ -5,7 +5,6 @@ module.exports.hashPass = async (req, res, next) => {
     req.hashPass = await bcrypt.hash(req.body.password, 5);
     next();
   } catch (err) {
-    console.log(err);
     next(new Error('Server Error on hash password'));
   }
 };

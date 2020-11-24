@@ -14,11 +14,9 @@ class RequireAuth extends Component {
     if(!PUBLIC_ROUTES.includes(this.props.location.pathname))
     {
       if (!checkToken()) {
-        console.log('chamge');
         this.props.history.push('/login');
       }
       else if(!this.props.user){
-          console.log('Require getUser');
           this.props.getUser();
       }
     }

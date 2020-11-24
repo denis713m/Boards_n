@@ -8,7 +8,6 @@ import styles from './RegistrationForm.module.sass';
 
 const RegistrationForm = (props) => {
     const { handleSubmit } = props;
-    console.log(props);
     return (
         <form onSubmit={handleSubmit} className={styles.mainContainer}>
             <div >

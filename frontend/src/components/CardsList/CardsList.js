@@ -6,7 +6,6 @@ import styles from './CardsList.module.sass';
 const CardsList = () => {
     const [isRenameList, changeRenameList]= useState(false);
     const renameList = async (values)=>{
-        console.log(values);
         changeRenameList(false)
     }
     return (

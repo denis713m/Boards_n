@@ -3,10 +3,12 @@ const cors = require('cors');
 const router = require('./src/router/router.js');
 const app = express();
 const errorHandler = require ('./src/errorHandlers/errorHandler.js');
+const logger = require ('./logger.js');
 const port = 5555;
 
 app.use(cors());
 app.use(express.json());
+app.use(logger);
 app.use(router);
 app.use(errorHandler);
 app.listen(port, () => {

@@ -65,11 +65,9 @@ const mapStateToProps = (state) => {
         };
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        getBoardById: (data) => dispatch(getBoardById(data)),
-        renameBoard: (data) => dispatch(boardRename(data))
-    }
+const mapDispatchToProps = {
+    getBoardById: getBoardById,
+    renameBoard: boardRename    
 };
 
 export default fp.flow(withRouter,connect(mapStateToProps, mapDispatchToProps))(BoardPage);

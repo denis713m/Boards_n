@@ -6,13 +6,13 @@ import {registerRequest, loginRequest, getUserRequest} from '../../api/fetchApi'
 export function* registrationUser(action) {
     yield put({type: types.REGISTRATION_USER_REQUEST});
     try{
-        const {data} = yield  registerRequest(action.data.values);
-        action.data.history.replace('/');
+        const {data} = yield  registerRequest(action.payload.values);
+        action.payload.history.replace('/');
         yield put({type: types.REGISTRATION_USER_SUCCESS, data:{
-            firstName: action.data.values.firstName,
+            firstName: action.payload.values.firstName,
             userId: data.id,
-            lastName: action.data.values.lastName,
-            displayName: action.data.values.displayName,
+            lastName: action.payload.values.lastName,
+            displayName: action.payload.values.displayName,
         }});
     }
     catch (e) {
@@ -23,8 +23,8 @@ export function* registrationUser(action) {
  export function* login(action) {
     yield put({type: types.REGISTRATION_USER_REQUEST});
     try{
-        const {data} = yield  loginRequest(action.data.values);
-        action.data.history.replace('/');
+        const {data} = yield  loginRequest(action.payload.values);
+        action.payload.history.replace('/');
         yield put({type: types.REGISTRATION_USER_SUCCESS, data:data});
     }
     catch (e) {

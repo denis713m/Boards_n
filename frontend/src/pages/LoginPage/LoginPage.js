@@ -20,15 +20,12 @@ const LoginPage = (props) => {
             <LoginForm onSubmit={submit} />             
         </div>
       </div>
-    );
-    
+    );    
 }
 
 
-  const mapDispatchToProps = dispatch => ({
-    login: userInfo => dispatch(login(userInfo))
-  })
-
-
+  const mapDispatchToProps = {
+    login: login
+  }
 
 export default fp.flow(withRouter, connect(null, mapDispatchToProps))(LoginPage);

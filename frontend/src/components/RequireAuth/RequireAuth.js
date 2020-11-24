@@ -50,10 +50,8 @@ const mapStateToProps = (state) => {
     return state.user;
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        getUser: () => dispatch(getUser())
-    }
+const mapDispatchToProps = {
+    getUser: getUser    
 };
 
 export default fp.flow(withRouter, connect(mapStateToProps, mapDispatchToProps))(RequireAuth);

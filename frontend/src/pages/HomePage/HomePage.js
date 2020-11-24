@@ -69,11 +69,10 @@ const mapStateToProps = (state) => {
             boards: state.boards};
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        createBoard: (data) => dispatch(boardCreate(data)),
-        getBoards: (data) => dispatch(getBoards(data))
-    }
+const mapDispatchToProps = {
+    createBoard: boardCreate,
+    getBoards: getBoards
+    
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

@@ -8,9 +8,9 @@ export function* createBoards(action) {
     try{
         const boards = getBoardsFromStorage();
         boards.forEach(element => {
-            if (element.name === action.data.name) throw new Error('Wrong name');
+            if (element.name === action.payload.name) throw new Error('Wrong name');
         });
-        const board = {name:action.data.name, user: action.data.user, id:uuidv4()}
+        const board = {name:action.payload.name, user: action.payload.user, id:uuidv4()}
         boards.push(board);
         window.localStorage.setItem('boards', JSON.stringify(boards));
         yield put({type: types.BOARD_CREATE_SUCCESS, data: board});
@@ -35,9 +35,9 @@ export function* createBoards(action) {
     yield put({type: types.BOARD_REQUEST});
     try{
         const boards = getBoardsFromStorage();    
-        let board={}
+        let board=null;
         boards.forEach(element => {
-            if (element.id === action.data) board=element;
+            if (element.id === action.payload) board=element;
         })
         if(!board) throw new Error('Board_absend');
         yield put({type: types.GET_BOARD_BY_ID_SUCCESS, data:board});
@@ -52,11 +52,11 @@ export function* createBoards(action) {
     try{
         const boards = getBoardsFromStorage();    
         boards.forEach(element => {
-            if (element.id === action.data.id) {
-                    element.name = action.data.name;}
+            if (element.id === action.payload.id) {
+                    element.name = action.payload.name;}
         }) 
         window.localStorage.setItem('boards', JSON.stringify(boards));    
-        yield put({type: types.BOARD_RENAME_SUCCESS, data:{newName:action.data.name,
+        yield put({type: types.BOARD_RENAME_SUCCESS, data:{newName:action.payload.name,
                                                             boards:boards}});
     }
     catch (e) {

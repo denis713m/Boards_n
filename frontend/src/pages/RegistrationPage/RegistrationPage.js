@@ -23,9 +23,9 @@ const RegistrationPage = (props) => {
     );
 }
 
-  const mapDispatchToProps = dispatch => ({
-    register: userInfo => dispatch(registerUser(userInfo))
-  })
+  const mapDispatchToProps = {
+    register: registerUser
+  }
 
 export default fp.flow(withRouter, connect(
     null,

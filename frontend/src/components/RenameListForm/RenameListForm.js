@@ -17,8 +17,6 @@ const RenameListForm = (props) => {
                     warning = {styles.fieldWarning}
                     component={FormInput}
                     type='text'
-                    label='Test'
-                    deftext='qwer'
                 />
                 <button type='submit' className={styles.btnRenameBoard}>
                     <span className={styles.submitBtn}>Rename</span>

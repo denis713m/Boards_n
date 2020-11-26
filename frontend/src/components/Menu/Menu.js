@@ -19,8 +19,7 @@ const Menu = (props) => {
     );
 }
 
-const mapDispatchToProps = dispatch => ({
-    logOut: () => dispatch(logOut())
-  })
+const mapDispatchToProps = {
+    logOut: logOut}
 
 export default connect(null, mapDispatchToProps)(Menu);

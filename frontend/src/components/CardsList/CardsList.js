@@ -10,7 +10,7 @@ const CardsList = () => {
     }
     return (
         <div className={styles.listContainer}>
-        {!isRenameList && <div className={styles.listTitle} onDoubleClick={() => changeRenameList(true)}>In progress</div>}                             
+       {!isRenameList && <div className={styles.listTitle} onDoubleClick={() => changeRenameList(true)}>In progress</div>}                             
                 {isRenameList && 
                         <RenameListForm close={() => changeRenameList(false)} 
                                                 onSubmit={renameList} name={'In progress'}/>}
@@ -20,7 +20,7 @@ const CardsList = () => {
             <div className={styles.card}>In progress</div>
             <div className={styles.card}>In progress</div>
         </div>
-        <button className={styles.btnAddCard}>Add a card...</button>
+        <button className={styles.btnAddCard}>Add a card...</button> 
     </div>
     );
 }

@@ -36,6 +36,14 @@ export default function(state = initialState, action) {
             error: null
         }
       }
+      case types.LIST_RENAME_SUCCESS:{
+        return{
+            ...state,
+            isFetching: false,
+            lists:[...action.data],
+            error: null
+        }
+      }
       default:{
         return state;
         }

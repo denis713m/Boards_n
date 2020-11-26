@@ -23,9 +23,10 @@ const BoardPage = (props) => {
     const changeBoardName = (values)=>{
         props.renameBoard({
             ...values,
-            id: props.board.id
-        })
-        changeRenameBoard(false)
+            id: props.board.id,
+            author: props.user.userId,
+        });
+        changeRenameBoard(false);
     }
 
     const deleteBoard = () =>{        
@@ -33,7 +34,7 @@ const BoardPage = (props) => {
             id: params,
             author: props.user.userId,
             history: props.history
-        })
+        });
     }
 
     const createList = (values) =>{
@@ -41,7 +42,7 @@ const BoardPage = (props) => {
             ...values,
             board: params,
             user: props.user.userId
-        })
+        });
     }
     const getLists = () =>{
         const lists =[];
@@ -49,6 +50,10 @@ const BoardPage = (props) => {
             lists.push(<CardsList list={element} key={element.id}/>)
         });
         return lists;
+    }
+
+    const showRenameBoard =()=>{
+        if (props.board.user === props.user.userId) changeRenameBoard(true);
     }
 
     return (
@@ -63,7 +68,8 @@ const BoardPage = (props) => {
                 :
                 <>
                     <div className={styles.containerHeader}>
-                        {!isRenameBoard && <span onDoubleClick={() => changeRenameBoard(true)}>{props.board.name}</span>}                             
+                        {!isRenameBoard  &&
+                                <span onDoubleClick={showRenameBoard}>{props.board.name}</span>}                             
                         {isRenameBoard && 
                             <RenameBoardForm close={() => changeRenameBoard(false)} 
                                                     onSubmit={changeBoardName} name={props.board.name}/>}

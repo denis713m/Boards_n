@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {listDelete} from '../../redux/actions';
+import {listDelete, listRename} from '../../redux/actions';
 import RenameListForm from '../RenameListForm/RenameListForm';
 import ListMenu from '../ListMenu/ListMenu';
 import styles from './CardsList.module.sass';
@@ -10,13 +10,17 @@ const CardsList = (props) => {
     const [isRenameList, changeRenameList]= useState(false);
     const [isListMenu, changeListMenu]= useState(false);
     const renameList = (values)=>{
-        changeRenameList(false)
+        props.listRename({
+            name: values.name,
+            id: props.list.id,
+            user:props.user
+        })
     }
     const deleteList = () =>{
-        console.log(props);
         props.listDelete({
             list:props.list.id,
-            user:props.user})
+            user:props.user,            
+        })
     }
     return (
         <>
@@ -65,7 +69,8 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToprops = {
-    listDelete: listDelete
+    listDelete: listDelete,
+    listRename: listRename
 }
 
 export default connect(mapStateToProps, mapDispatchToprops)(CardsList);

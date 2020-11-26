@@ -4,9 +4,9 @@ import {connect} from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import fp from 'lodash/fp';
 import Header from '../../components/Header/Header';
-import {getBoardById, boardRename, boardDelete} from '../../redux/actions';
+import {getBoardById, boardRename, boardDelete, listCreate} from '../../redux/actions';
 import RenameBoardForm from '../../components/RenameBoardForm/RenameBoardForm';
-
+import CreateListForm from '../../components/CreateListForm/CreateListForm';
 import Spinner from '../../components/Spinner/Spinner';
 import CardsList from '../../components/CardsList/CardsList';
 import BoardMenu from '../../components/BoardMenu/BoardMenu';
@@ -36,7 +36,20 @@ const BoardPage = (props) => {
         })
     }
 
-
+    const createList = (values) =>{
+        props.listCreate({
+            ...values,
+            board: params,
+            user: props.user.userId
+        })
+    }
+    const getLists = () =>{
+        const lists =[];
+        if (props.lists)props.lists.forEach(element => {
+            lists.push(<CardsList list={element} key={element.id}/>)
+        });
+        return lists;
+    }
 
     return (
         <>
@@ -65,7 +78,8 @@ const BoardPage = (props) => {
                     <div className={styles.listsContainer}>
                         <CardsList/>
                         <CardsList/>
-                                              
+                        {getLists()}
+                        <CreateListForm onSubmit={createList}/>                                                   
                     </div>
 
                 </>
@@ -80,6 +94,7 @@ const BoardPage = (props) => {
 const mapStateToProps = (state) => {
     return {user: state.user.user,
             board: state.boards.currentBoard,
+            lists: state.list.lists,
             isFetching: state.boards.isFetching
         };
 };
@@ -87,7 +102,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     getBoardById: getBoardById,
     renameBoard: boardRename,
-    boardDelete: boardDelete,    
+    boardDelete: boardDelete,
+    listCreate: listCreate,
 };
 
 export default fp.flow(withRouter,connect(mapStateToProps, mapDispatchToProps))(BoardPage);

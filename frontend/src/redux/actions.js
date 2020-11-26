@@ -18,3 +18,11 @@ export const boardRename = createAction(types.BOARD_RENAME)
 export const getBoards = createAction(types.GET_BOARDS)
 
 export const getBoardById = createAction(types.GET_BOARD_BY_ID)
+
+export const listCreate = createAction(types.LIST_CREATE)
+
+export const listDelete = createAction(types.LIST_DELETE)
+
+export const listRename = createAction(types.LIST_RENAME)
+
+export const getListByBoard = createAction(types.GET_LISTS_BY_BOARD)

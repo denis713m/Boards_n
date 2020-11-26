@@ -32,19 +32,26 @@ export function* createBoards(action) {
  }
 
  export function* getBoardById(action) {
-    yield put({type: types.BOARD_REQUEST});
-    try{
-        const boards = getBoardsFromStorage();    
-        let board=null;
-        boards.forEach(element => {
-            if (element.id === action.payload) board=element;
-        })
-        if(!board) throw new Error('Board_absend');
-        yield put({type: types.GET_BOARD_BY_ID_SUCCESS, data:board});
-    }
-    catch (e) {
-        yield put({type: types.BOARD_OPERATION_ERROR, error: e.response});
-    }
+     yield put({
+         type: types.BOARD_REQUEST
+     });
+     try {
+         const boards = getBoardsFromStorage();
+         let board = null;
+         boards.forEach(element => {
+             if (element.id === action.payload) board = element;
+         })
+         if (!board) throw new Error('Board_absend');
+         yield put({
+             type: types.GET_BOARD_BY_ID_SUCCESS,
+             data: board
+         });
+     } catch (e) {
+         yield put({
+             type: types.BOARD_OPERATION_ERROR,
+             error: e.response
+         });
+     }
  }
 
  export function* renameBoard(action) {
@@ -58,6 +65,21 @@ export function* createBoards(action) {
         window.localStorage.setItem('boards', JSON.stringify(boards));    
         yield put({type: types.BOARD_RENAME_SUCCESS, data:{newName:action.payload.name,
                                                             boards:boards}});
+    }
+    catch (e) {
+        yield put({type: types.BOARD_OPERATION_ERROR, error: e.response});
+    }
+ }
+
+ export function* deleteBoard(action) {
+    yield put({type: types.BOARD_REQUEST});
+    try{
+        const boards = getBoardsFromStorage(); 
+        const newBoards = boards.filter(element => ((element.id !== action.payload.id) 
+                                                    || (element.user !== action.payload.author)));        
+        window.localStorage.setItem('boards', JSON.stringify(newBoards));
+        action.payload.history.replace('/');    
+        yield put({type: types.BOARD_DELETE_SUCCESS, data:{boards:boards}});
     }
     catch (e) {
         yield put({type: types.BOARD_OPERATION_ERROR, error: e.response});

@@ -11,7 +11,7 @@ export const logOut = createAction(types.LOG_OUT)
 
 export const boardCreate = createAction(types.BOARD_CREATE)
 
-export const boardDeelete = createAction(types.BOARD_DELETE)
+export const boardDelete = createAction(types.BOARD_DELETE)
 
 export const boardRename = createAction(types.BOARD_RENAME)
 

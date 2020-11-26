@@ -42,6 +42,14 @@ const initialState = {
             error: null
         }
       }
+      case types.BOARD_DELETE_SUCCESS:{
+        return {...state,
+            isFetching: false,
+            currentBoard: {},
+            boards: [...action.data.boards],
+            error: null
+        }
+      }
       case types.BOARD_OPERATION_ERROR:{
         return {
           ...state,

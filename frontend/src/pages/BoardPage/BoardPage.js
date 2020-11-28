@@ -78,8 +78,6 @@ const BoardPage = (props) => {
                             )}
                         </div>
                         <div className={styles.listsContainer}>
-                            <CardsList />
-                            <CardsList />
                             {getLists()}
                             <CreateListForm onSubmit={createList} />
                         </div>

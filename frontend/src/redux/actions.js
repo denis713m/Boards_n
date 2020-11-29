@@ -26,3 +26,9 @@ export const listDelete = createAction(types.LIST_DELETE)
 export const listRename = createAction(types.LIST_RENAME)
 
 export const getListByBoard = createAction(types.GET_LISTS_BY_BOARD)
+
+export const cardCreate = createAction(types.CARD_CREATE)
+
+export const cardDelete = createAction(types.CARD_DELETE)
+
+export const chooseCard = createAction(types.CHOOSE_CARD)

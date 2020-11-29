@@ -31,9 +31,7 @@ export function* createBoards(action) {
 }
 
 export function* getBoards(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
         const boards = getBoardsFromStorage();
         yield put({
@@ -57,6 +55,11 @@ export function* getBoardById(action) {
         const board = _.find(boards, { id: action.payload });
         if (_.isUndefined(board)) throw new Error('Board_absend');
         const lists = getListsFromStorageByBoard(action.payload);
+        const cards = getCardsFromStorageByBoard(action.payload);
+        yield put({
+            type: types.GET_CARDS_BY_BOARD_SUCCESS,
+            data: cards,
+        });
         yield put({
             type: types.GET_LISTS_BY_BOARD_SUCCESS,
             data: lists,
@@ -100,9 +103,7 @@ export function* renameBoard(action) {
 }
 
 export function* deleteBoard(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
         const boards = getBoardsFromStorage();
         const newBoards = boards.filter(

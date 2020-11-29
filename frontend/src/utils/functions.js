@@ -14,6 +14,22 @@ export const saveListToStorage = (newList) => {
     window.localStorage.setItem('lists', JSON.stringify(lists));
 }
 
-export const getListsFromStorage = (boardId) => {
+export const getListsFromStorage = () => {
     return JSON.parse(window.localStorage.getItem('lists') || '[]');    
+}
+
+export const saveCardToStorage = (newCard) => {
+    const cards = JSON.parse(window.localStorage.getItem('cards') || '[]');
+    cards.push(newCard);
+    window.localStorage.setItem('cards', JSON.stringify(cards));
+}
+
+export const getCardsFromStorageByBoard = (boardId) => {
+    const cards = JSON.parse(window.localStorage.getItem('cards') || '[]');
+    const boardCards = cards.filter(card => card.boardId === boardId)
+    return boardCards;
+}
+
+export const getCardsFromStorage = () => {
+    return JSON.parse(window.localStorage.getItem('cards') || '[]');    
 }

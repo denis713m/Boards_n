@@ -1,35 +1,9 @@
-export const getBoardsFromStorage = () => {
-    return JSON.parse(window.localStorage.getItem('boards') || '[]')
-}
+import moment from 'moment';
 
-export const getListsFromStorageByBoard = (boardId) => {
-    const lists = JSON.parse(window.localStorage.getItem('lists') || '[]');
-    const boardLists = lists.filter(list => list.boardId === boardId)
-    return boardLists;
-}
-
-export const saveListToStorage = (newList) => {
-    const lists = JSON.parse(window.localStorage.getItem('lists') || '[]');
-    lists.push(newList);
-    window.localStorage.setItem('lists', JSON.stringify(lists));
-}
-
-export const getListsFromStorage = () => {
-    return JSON.parse(window.localStorage.getItem('lists') || '[]');    
-}
-
-export const saveCardToStorage = (newCard) => {
-    const cards = JSON.parse(window.localStorage.getItem('cards') || '[]');
-    cards.push(newCard);
-    window.localStorage.setItem('cards', JSON.stringify(cards));
-}
-
-export const getCardsFromStorageByBoard = (boardId) => {
-    const cards = JSON.parse(window.localStorage.getItem('cards') || '[]');
-    const boardCards = cards.filter(card => card.boardId === boardId)
-    return boardCards;
-}
-
-export const getCardsFromStorage = () => {
-    return JSON.parse(window.localStorage.getItem('cards') || '[]');    
-}
+export const timeDifference = (date) => {
+    const diff = moment.duration(moment().diff(moment(date, 'YYYY-MM-DD HH:mm')));
+    if (diff.get('months') !== 0) return date;
+    else if (diff.get('days') !== 0) return `${diff.get('days')} days ago`;
+    else if (diff.get('hours') !== 0) return `${diff.get('hours')} hours ago`;
+    else return 'less than one hour';    
+};

@@ -1,7 +1,12 @@
 import * as types from '../actionTypes';
 import { put } from 'redux-saga/effects';
 import { v4 as uuidv4 } from 'uuid';
-import { getBoardsFromStorage, getListsFromStorageByBoard } from '../../utils/functions';
+import {
+    getBoardsFromStorage,
+    getListsFromStorageByBoard,
+    getCardsFromStorageByBoard,
+    getActivityFromStorageByBoard,
+} from '../../utils/storageFunctions';
 
 export function* createBoards(action) {
     yield put({
@@ -56,6 +61,7 @@ export function* getBoardById(action) {
         if (_.isUndefined(board)) throw new Error('Board_absend');
         const lists = getListsFromStorageByBoard(action.payload);
         const cards = getCardsFromStorageByBoard(action.payload);
+        const activities = getActivityFromStorageByBoard(action.payload);
         yield put({
             type: types.GET_CARDS_BY_BOARD_SUCCESS,
             data: cards,
@@ -67,6 +73,7 @@ export function* getBoardById(action) {
         yield put({
             type: types.GET_BOARD_BY_ID_SUCCESS,
             data: board,
+            activities: activities,
         });
     } catch (e) {
         yield put({

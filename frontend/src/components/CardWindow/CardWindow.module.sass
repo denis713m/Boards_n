@@ -11,14 +11,13 @@
 .container
     outline: none
     position: absolute
-    top: 30%
+    top: 10%
     left: 50%
     width: 50%
     min-width: 600px
     right: auto
-    bottom: auto
     margin-right: -50%
-    transform: translate(-50%, -50%)
+    transform: translate(-50%)
     padding: 10px
     background-color: #EEEFF1
     border-radius: 10px
@@ -84,6 +83,16 @@
     margin-top: 10px
     display: flex
     align-items: flex-start
+.badge
+    margin-right: 5px
+    min-width: 40px
+    border-radius: 50%
+    height: 40px
+    width: 40px
+    color: #38393B
+    line-height: 40px
+    text-align: center
+    background-color: #D7D8DF
 .commentField
     background-color: white    
     height: 80px
@@ -113,8 +122,11 @@
     color: #9BA0A3
     font-size: 14px
     font-weight: 500
+    cursor: pointer
 .activityDetailsItem
     @extend .commentContainer
+    flex-direction: column
+    margin-left: -50px
 .activityAuthor
     font-size: 16px
     color:#464749

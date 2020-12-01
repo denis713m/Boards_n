@@ -1,8 +1,18 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import styles from './BoardMenu.module.sass';
+import Activity from '../Activity/Activity';
 
 const BoardMenu = (props) => {
+    const getActivities = () => {
+        const activities = [];
+        props.activities.forEach((item) =>
+            activities.push(
+                <Activity item={item} key={item.id} card={styles.card}/>
+            )
+        );
+        return activities;
+    };
     return (
         <div className={styles.mainContainer}>
             <div className={styles.menuHeader}>
@@ -20,21 +30,13 @@ const BoardMenu = (props) => {
                 <img src={'/activity.jpg'} className={styles.icon}></img>
                 <p>Activity</p>
             </div>
-            <div className={styles.activityItem}>
-                <div className={styles.badge}>T</div>
-                <div className={styles.description}>
-                    <span className={styles.author}>test@freshcodeit.com</span>
-                    <span className={styles.action}> added </span>
-                    <Link className={styles.card} to={'#'}>
-                        {' '}
-                        Card5
-                    </Link>
-                    <span className={styles.action}> to Queue </span>
-                    <div className={styles.time}>5 hours ago</div>
-                </div>
-            </div>
+            {getActivities()}
         </div>
     );
 };
 
-export default BoardMenu;
+const mapStateToProps = (state) => {
+    return { activities: state.boards.activities };
+};
+
+export default connect(mapStateToProps)(BoardMenu);

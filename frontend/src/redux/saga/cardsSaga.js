@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { select } from 'redux-saga/effects';
 import { saveCardToStorage, getCardsFromStorage, writeActivity } from '../../utils/storageFunctions';
 
-
 export function* createCard(action) {
     yield put({ type: types.CARD_REQUEST });
     try {
@@ -55,19 +54,46 @@ export function* deleteCard(action) {
         const activity = writeActivity(
             {
                 type: activitiTypes.DELETE_CARD,
-                card:action.payload.name,
+                card: action.payload.name,
                 list: action.payload.list,
             },
             action.payload.user,
             action.payload.board,
-            action.payload.authorInfo,                        
+            action.payload.authorInfo,
         );
         const { card } = yield select();
         const stateCard = card.cards.filter((element) => element.id !== action.payload.card);
         yield put({
             type: types.CARD_DELETE_SUCCESS,
             data: stateCard,
-            activity: activity
+            activity: activity,
+        });
+    } catch (e) {
+        yield put({
+            type: types.CARD_OPERATION_ERROR,
+            error: e.response,
+        });
+    }
+}
+
+export function* createComment(action) {
+    yield put({ type: types.CARD_REQUEST });
+    try {
+        console.log(action.payload);
+        const activity = writeActivity(
+            {
+                type: activitiTypes.ADD_COMMENT,
+                card: action.payload.name,
+                comment: action.payload.comment,
+            },
+            action.payload.user,
+            action.payload.board,
+            action.payload.authorInfo,
+            action.payload.cardId
+        );
+        yield put({
+            type: types.ADD_COMMENT_SUCCESS,
+            activity: activity,
         });
     } catch (e) {
         yield put({

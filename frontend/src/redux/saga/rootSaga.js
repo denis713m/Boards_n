@@ -1,9 +1,9 @@
-import { takeLatest } from 'redux-saga/effects';
+import { takeLatest, takeEvery } from 'redux-saga/effects';
 import * as types from '../actionTypes';
 import { registrationUser, login, getUser } from './userSaga';
 import { createBoards, getBoards, getBoardById, renameBoard, deleteBoard } from './boardsSaga';
 import { createList, deleteList, renameList } from './listsSaga';
-import { createCard, deleteCard } from './cardsSaga';
+import { createCard, deleteCard, createComment } from './cardsSaga';
 
 function* rootSaga() {
     yield takeLatest(types.REGISTRATION_USER, registrationUser);
@@ -19,6 +19,7 @@ function* rootSaga() {
     yield takeLatest(types.LIST_RENAME, renameList);
     yield takeLatest(types.CARD_CREATE, createCard);
     yield takeLatest(types.CARD_DELETE, deleteCard);
+    yield takeEvery(types.CREATE_COMMENT, createComment);
 }
 
 export default rootSaga;

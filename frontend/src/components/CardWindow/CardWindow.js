@@ -3,16 +3,47 @@ import { connect } from 'react-redux';
 import Icon from '@mdi/react';
 import { mdiChatOutline, mdiClose } from '@mdi/js';
 import Activity from '../Activity/Activity';
+import CreateCommentForm from '../CreateCommentForm/CreateCommentForm';
+import { createComment } from '../../redux/actions';
+import { ADD_COMMENT } from '../../utils/activityTypes';
 import styles from './CardWindow.module.sass';
+import CreateDescriptionForm from '../CreateDescriptionForm/CreateDescriptionForm';
 
 const CardWindow = (props) => {
     const [isShowDetails, showDetails] = useState(true);
+    const [isCreateDescriptionForm, showCreateDescriptionForm] = useState(false);
     const getActivities = () => {
         const activities = [];
         props.activities.forEach((item) => {
-            if (item.cardId === props.currentCard.id) activities.push(<Activity key={item.id} item={item} cardWindow={true} />);
+            if (item.cardId === props.currentCard.id)
+                activities.push(<Activity key={item.id} item={item} cardWindow={true} />);
         });
         return activities;
+    };
+    const getComments = () => {
+        const comments = [];
+        props.activities.forEach((item) => {
+            if (item.activity.type === ADD_COMMENT && item.cardId === props.currentCard.id)
+                comments.push(<Activity key={item.id} item={item} cardWindow={true} />);
+        });
+        return comments;
+    };
+    const saveComment = (values) => {
+        props.createComment({
+            comment: values.name,
+            name: props.currentCard.name,
+            user: props.currentCard.userId,
+            board: props.currentCard.boardId,
+            authorInfo: {
+                name: props.currentCard.userName,
+                email: props.currentCard.userEmail,
+            },
+            cardId: props.currentCard.id,
+        });
+    };
+    const addDescription = (values) => {
+        console.log(values);
+        showCreateDescriptionForm(false)
     };
     return (
         <div className={styles.overlay}>
@@ -32,19 +63,28 @@ const CardWindow = (props) => {
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.mainContainer}>
-                        <div className={styles.descriptionContainer}>
-                            <img src={'/descript.jpg'} className={styles.iconDescript}></img>
-                            <span className={styles.editDescription}>Edit the discription</span>
-                        </div>
+                        {isCreateDescriptionForm ? (
+                            <CreateDescriptionForm
+                                onSubmit={addDescription}
+                                close={() => showCreateDescriptionForm(false)}
+                            />
+                        ) : (
+                            <div
+                                className={styles.descriptionContainer}
+                                onClick={() => showCreateDescriptionForm(true)}
+                            >
+                                <img src={'/descript.jpg'} className={styles.iconDescript}></img>
+                                <span className={styles.editDescription}>Edit the discription</span>
+                            </div>
+                        )}
                         <div className={styles.commentHeaderContainer}>
                             <Icon path={mdiChatOutline} size={1} className={styles.commentIcon} />
                             <h3 className={styles.title}>Add comment</h3>
                         </div>
                         <div className={styles.commentContainer}>
                             <div className={styles.badge}>{props.currentCard.userName.substring(0, 1)}</div>
-                            <div className={styles.commentField}> Write a comment... </div>
+                            <CreateCommentForm onSubmit={saveComment} />
                         </div>
-                        <button className={styles.btnSaveComment}>Save</button>
                         <div className={styles.activityPanel}>
                             <div className={styles.activityHeader}>
                                 <img src={'/activity.jpg'} className={styles.icon}></img>
@@ -54,7 +94,9 @@ const CardWindow = (props) => {
                                 {isShowDetails ? 'Hide Details' : 'Show Details'}
                             </div>
                         </div>
-                        {isShowDetails && <div className={styles.activityDetailsItem}>{getActivities()}</div>}
+                        <div className={styles.activityDetailsItem}>
+                            {isShowDetails ? getActivities() : getComments()}
+                        </div>
                     </div>
                     <div className={styles.asideContainer}>
                         <div className={styles.asideTitle}>Actions</div>
@@ -76,4 +118,8 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps)(CardWindow);
+const mapDispatchToProps = {
+    createComment: createComment,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CardWindow);

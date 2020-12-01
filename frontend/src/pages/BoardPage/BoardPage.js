@@ -41,6 +41,10 @@ const BoardPage = (props) => {
             ...values,
             board: params,
             user: props.user.userId,
+            authorInfo:{
+                name:props.user.firstName,
+                email:props.user.email
+            }
         });
     };
     const getLists = () => {

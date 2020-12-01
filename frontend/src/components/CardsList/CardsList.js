@@ -16,21 +16,39 @@ const CardsList = (props) => {
         props.listRename({
             name: values.name,
             id: props.list.id,
+            oldName: props.list.name,
             user: props.user.userId,
+            board: props.board,
+            authorInfo:{
+                name:props.user.firstName,
+                email:props.user.email
+            }
         });
+        changeRenameList(false);
     };
     const deleteList = () => {
         props.listDelete({
             list: props.list.id,
             user: props.user.userId,
+            board: props.board,
+            name: props.list.name,
+            authorInfo:{
+                name:props.user.firstName,
+                email:props.user.email
+            }
         });
     };
     const createCard = (values) => {
         props.cardCreate({
             ...values,
-            list: props.list.id,
+            list: props.list.name,
+            listId: props.list.id,
             user: props.user.userId,
             board: props.board,
+            authorInfo:{
+                name:props.user.firstName,
+                email:props.user.email
+            }
         });
         changeAddCardShow(false);
     };
@@ -60,7 +78,17 @@ const CardsList = (props) => {
         changeShowCardWindow(true);
     };
     const removeCard = () => {
-        props.cardDelete({ card: props.currentCard.id });
+        props.cardDelete({
+            card: props.currentCard.id,
+            board: props.board,
+            list: props.list.name,
+            author: props.user.id,
+            name: props.currentCard.name,
+            authorInfo:{
+                name:props.user.firstName,
+                email:props.user.email
+            }
+        });
         changeShowCardWindow(false);
     };
     return (

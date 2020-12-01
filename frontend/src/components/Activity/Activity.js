@@ -46,6 +46,15 @@ const Activity = (props) => {
                     <span className={props.card}>{item.activity.list}</span>,
                 ];
             }
+            case activityType.ADD_COMMENT: {
+                const activities = [];
+                if (!props.cardWindow)
+                    activities.push(
+                        <span className={props.action}> commented card </span>,
+                        <span className={props.card}>{item.activity.card}</span>
+                    );
+                return activities;
+            }
         }
     };
     return (
@@ -55,6 +64,8 @@ const Activity = (props) => {
                 <span className={props.author}>{item.authorInfo.email}</span>
                 {action()}
                 <div className={props.time}>{timeDifference(item.time)}</div>
+                {(item.activity.type === activityType.ADD_COMMENT) &&
+                <div className = {styles.commentContainer}>{item.activity.comment}</div>}
             </div>
         </div>
     );
@@ -67,7 +78,7 @@ Activity.defaultProps = {
     author: styles.author,
     time: styles.time,
     card: styles.card,
-    action: styles.action
-}
+    action: styles.action,
+};
 
 export default Activity;

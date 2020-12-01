@@ -45,7 +45,8 @@ export default function (state = initialState, action) {
         case types.LIST_DELETE_SUCCESS:
         case types.LIST_RENAME_SUCCESS:
         case types.CARD_CREATE_SUCCESS:
-        case types.CARD_DELETE_SUCCESS: {
+        case types.CARD_DELETE_SUCCESS:
+        case types.ADD_COMMENT_SUCCESS: {
             return {
                 ...state,
                 activities: [action.activity, ...state.activities],

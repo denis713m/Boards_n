@@ -59,7 +59,7 @@ export function* deleteCard(action) {
             },
             action.payload.user,
             action.payload.board,
-            action.payload.authorInfo,
+            action.payload.authorInfo
         );
         const { card } = yield select();
         const stateCard = card.cards.filter((element) => element.id !== action.payload.card);
@@ -79,7 +79,6 @@ export function* deleteCard(action) {
 export function* createComment(action) {
     yield put({ type: types.CARD_REQUEST });
     try {
-        console.log(action.payload);
         const activity = writeActivity(
             {
                 type: activitiTypes.ADD_COMMENT,
@@ -94,6 +93,33 @@ export function* createComment(action) {
         yield put({
             type: types.ADD_COMMENT_SUCCESS,
             activity: activity,
+        });
+    } catch (e) {
+        yield put({
+            type: types.CARD_OPERATION_ERROR,
+            error: e.response,
+        });
+    }
+}
+
+export function* addDescription(action) {
+    yield put({ type: types.CARD_REQUEST });
+    try {
+        const cards = getCardsFromStorage();
+        cards.forEach((element) => {
+            if (element.id === action.payload.card && element.userId === action.payload.user)
+                element.description = action.payload.description;
+        });
+        window.localStorage.setItem('cards', JSON.stringify(cards));
+        const { card } = yield select();
+        card.cards.forEach((element) => {
+            if (element.id === action.payload.card && element.userId === action.payload.user)
+                element.description = action.payload.description;
+        });
+        yield put({
+            type: types.CARD_ADD_DESCRIPTION_SUCCESS,
+            data: card.cards,
+            description: action.payload.description
         });
     } catch (e) {
         yield put({

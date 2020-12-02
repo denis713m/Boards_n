@@ -44,6 +44,15 @@ export default function (state = initialState, action) {
                 error: null,
             };
         }
+        case types.CARD_ADD_DESCRIPTION_SUCCESS: {
+            return {
+                ...state,
+                isFetching: false,
+                cards: [...action.data],
+                currentCard: { ...state.currentCard, description: action.description },
+                error: null,
+            };
+        }
         case types.CARD_OPERATION_ERROR: {
             return {
                 ...state,

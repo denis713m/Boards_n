@@ -34,3 +34,5 @@ export const cardDelete = createAction(types.CARD_DELETE)
 export const chooseCard = createAction(types.CHOOSE_CARD)
 
 export const createComment = createAction(types.CREATE_COMMENT)
+
+export const addDescription = createAction(types.CARD_ADD_DESCRIPTION)

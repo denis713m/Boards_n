@@ -111,9 +111,6 @@ const CardsList = (props) => {
             )}
 
             <div className={styles.cardContainer}>
-                <div className={styles.card} onClick={() => changeShowCardWindow(true)}>
-                    In progress
-                </div>
                 {getCards()}
             </div>
             {isAddCard ? (

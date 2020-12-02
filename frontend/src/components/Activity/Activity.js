@@ -9,49 +9,49 @@ const Activity = (props) => {
         switch (item.activity.type) {
             case activityType.CREATE_LIST: {
                 return [
-                    <span className={props.action}> created list </span>,
-                    <span className={props.card}>{item.activity.list}</span>,
+                    <span className={props.action} key={1}> created list </span>,
+                    <span className={props.card} key={2}>{item.activity.list}</span>,
                 ];
             }
             case activityType.DELETE_LIST: {
                 return [
-                    <span className={props.action}> deleted list </span>,
-                    <span className={props.card}>{item.activity.list}</span>,
+                    <span className={props.action} key={1}> deleted list </span>,
+                    <span className={props.card} key={2}>{item.activity.list}</span>,
                 ];
             }
             case activityType.RENAME_LIST: {
                 return [
-                    <span className={props.action}> rename list </span>,
-                    <span className={props.card}>{item.activity.list}</span>,
-                    <span className={props.action}> to </span>,
-                    <span className={props.card}>{item.activity.newName}</span>,
+                    <span className={props.action} key={1}> rename list </span>,
+                    <span className={props.card} key={2}>{item.activity.list}</span>,
+                    <span className={props.action} key={3}> to </span>,
+                    <span className={props.card} key={4}>{item.activity.newName}</span>,
                 ];
             }
             case activityType.CREATE_CARD:
                 const activities = [];
                 activities.push(
-                    <span className={props.action}>{props.cardWindow ? ' created this card' : ' added card'} </span>
+                    <span className={props.action} key={1}>{props.cardWindow ? ' created this card' : ' added card'} </span>
                 );
-                if (!props.cardWindow) activities.push(<span className={props.card}>{item.activity.card}</span>);
+                if (!props.cardWindow) activities.push(<span className={props.card} key={2}>{item.activity.card}</span>);
                 return [
                     ...activities,
-                    <span className={props.action}> {props.cardWindow ? ' in list' : ' to list'} </span>,
-                    <span className={props.card}>{item.activity.list}</span>,
+                    <span className={props.action} key={3}> {props.cardWindow ? ' in list' : ' to list'} </span>,
+                    <span className={props.card} key={4}>{item.activity.list}</span>,
                 ];
             case activityType.DELETE_CARD: {
                 return [
-                    <span className={props.action}> deleted card </span>,
-                    <span className={props.card}>{item.activity.card}</span>,
-                    <span className={props.action}> in list </span>,
-                    <span className={props.card}>{item.activity.list}</span>,
+                    <span className={props.action} key={1}> deleted card </span>,
+                    <span className={props.card} key={2}>{item.activity.card}</span>,
+                    <span className={props.action} key={3}> in list </span>,
+                    <span className={props.card} key={4}>{item.activity.list}</span>,
                 ];
             }
             case activityType.ADD_COMMENT: {
                 const activities = [];
                 if (!props.cardWindow)
                     activities.push(
-                        <span className={props.action}> commented card </span>,
-                        <span className={props.card}>{item.activity.card}</span>
+                        <span className={props.action} key={1}> commented card </span>,
+                        <span className={props.card} key={2}>{item.activity.card}</span>
                     );
                 return activities;
             }

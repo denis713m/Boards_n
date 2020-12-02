@@ -4,7 +4,7 @@ import Icon from '@mdi/react';
 import { mdiChatOutline, mdiClose } from '@mdi/js';
 import Activity from '../Activity/Activity';
 import CreateCommentForm from '../CreateCommentForm/CreateCommentForm';
-import { createComment } from '../../redux/actions';
+import { createComment, addDescription } from '../../redux/actions';
 import { ADD_COMMENT } from '../../utils/activityTypes';
 import styles from './CardWindow.module.sass';
 import CreateDescriptionForm from '../CreateDescriptionForm/CreateDescriptionForm';
@@ -42,8 +42,12 @@ const CardWindow = (props) => {
         });
     };
     const addDescription = (values) => {
-        console.log(values);
-        showCreateDescriptionForm(false)
+        props.addDescription({
+            card: props.currentCard.id,
+            description: values.name,
+            user: props.currentCard.userId,
+        });
+        showCreateDescriptionForm(false);
     };
     return (
         <div className={styles.overlay}>
@@ -63,7 +67,9 @@ const CardWindow = (props) => {
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.mainContainer}>
-                        {isCreateDescriptionForm ? (
+                        {props.currentCard.description ? (
+                            <span className={styles.editDescription}>{props.currentCard.description}</span>
+                        ) : isCreateDescriptionForm ? (
                             <CreateDescriptionForm
                                 onSubmit={addDescription}
                                 close={() => showCreateDescriptionForm(false)}
@@ -120,6 +126,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     createComment: createComment,
+    addDescription: addDescription,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CardWindow);

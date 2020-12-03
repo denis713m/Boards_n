@@ -6,9 +6,7 @@ export const getBoardsFromStorage = () => {
 };
 
 export const getListsFromStorageByBoard = (boardId) => {
-    const lists = JSON.parse(window.localStorage.getItem('lists') || '[]');
-    const boardLists = lists.filter((list) => list.boardId === boardId);
-    return boardLists;
+    return JSON.parse(window.localStorage.getItem('lists') || '[]').filter((list) => list.boardId === boardId);
 };
 
 export const saveListToStorage = (newList) => {
@@ -23,8 +21,13 @@ export const getListsFromStorage = () => {
 
 export const saveCardToStorage = (newCard) => {
     const cards = JSON.parse(window.localStorage.getItem('cards') || '[]');
-    cards.push(newCard);
+    let lastIndex = 0;
+    cards.forEach((card) => {
+        if (card.listId === newCard.listId && card.index >= lastIndex) lastIndex = card.index + 1;
+    });
+    cards.push({ ...newCard, index: lastIndex });
     window.localStorage.setItem('cards', JSON.stringify(cards));
+    return lastIndex;
 };
 
 export const getCardsFromStorageByBoard = (boardId) => {
@@ -48,7 +51,7 @@ export const writeActivity = (activity, userId, boardId, authorInfo, cardId) => 
         time: moment().format('YYYY-MM-DD HH:mm'),
     };
     if (cardId) newActivity.cardId = cardId;
-    activities.splice(0,0,newActivity);
+    activities.splice(0, 0, newActivity);
     window.localStorage.setItem('activities', JSON.stringify(activities));
     return newActivity;
 };
@@ -57,4 +60,26 @@ export const getActivityFromStorageByBoard = (boardId) => {
     const activity = JSON.parse(window.localStorage.getItem('activities') || '[]');
     const boardActivities = activity.filter((list) => list.boardId === boardId);
     return boardActivities;
+};
+
+export const deleteCardsByList = (listId) => {
+    const cards = getCardsFromStorage();
+    const newCards = cards.filter((card) => !listId.includes(card.listId));
+    window.localStorage.setItem('cards', JSON.stringify(newCards));
+};
+
+export const deleteListByBoard = (boardId) => {
+    const lists = getListsFromStorage();
+    const deletedLists = [];
+    const newLists = lists.filter((list) => {
+        if (list.boardId === boardId) {
+            deletedLists.push(list.id);
+            return false;
+        } else return true;
+    });
+    deleteCardsByList(deletedLists);
+    window.localStorage.setItem('lists', JSON.stringify(newLists));
+    const activity = JSON.parse(window.localStorage.getItem('activities') || '[]');
+    const newActivity = activity.filter((activity) => activity.boardId !== boardId);
+    window.localStorage.setItem('activities', JSON.stringify(newActivity));
 };

@@ -42,7 +42,7 @@ module.exports.getUser = async (req, res) => {
         userId: user.id,
         lastName: user.lastName,
         displayName: user.displayName,
-        accessToken: tokens.accessToken,
+        accessToken: user.accessToken,
         email: user.email,
     });
 };

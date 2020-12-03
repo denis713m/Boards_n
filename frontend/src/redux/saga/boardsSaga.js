@@ -1,11 +1,13 @@
 import * as types from '../actionTypes';
 import { put } from 'redux-saga/effects';
 import { v4 as uuidv4 } from 'uuid';
+import _ from 'lodash';
 import {
     getBoardsFromStorage,
     getListsFromStorageByBoard,
     getCardsFromStorageByBoard,
     getActivityFromStorageByBoard,
+    deleteListByBoard,
 } from '../../utils/storageFunctions';
 
 export function* createBoards(action) {
@@ -61,10 +63,11 @@ export function* getBoardById(action) {
         if (_.isUndefined(board)) throw new Error('Board_absend');
         const lists = getListsFromStorageByBoard(action.payload);
         const cards = getCardsFromStorageByBoard(action.payload);
+        const sortedCards = _.sortBy(cards, ['index']);
         const activities = getActivityFromStorageByBoard(action.payload);
         yield put({
             type: types.GET_CARDS_BY_BOARD_SUCCESS,
-            data: cards,
+            data: sortedCards,
         });
         yield put({
             type: types.GET_LISTS_BY_BOARD_SUCCESS,
@@ -78,7 +81,7 @@ export function* getBoardById(action) {
     } catch (e) {
         yield put({
             type: types.BOARD_OPERATION_ERROR,
-            error: e.response,
+            error: e.message,
         });
     }
 }
@@ -104,7 +107,7 @@ export function* renameBoard(action) {
     } catch (e) {
         yield put({
             type: types.BOARD_OPERATION_ERROR,
-            error: e.response,
+            error: e.message,
         });
     }
 }
@@ -118,6 +121,7 @@ export function* deleteBoard(action) {
         );
         if (newBoards.length === boards.length) throw new Error('Yoy cant delete this board');
         window.localStorage.setItem('boards', JSON.stringify(newBoards));
+        deleteListByBoard(action.payload.id);
         action.payload.history.replace('/');
         yield put({
             type: types.BOARD_DELETE_SUCCESS,

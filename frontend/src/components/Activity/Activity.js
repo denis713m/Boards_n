@@ -55,6 +55,16 @@ const Activity = (props) => {
                     );
                 return activities;
             }
+            case activityType.REPLACE_CARD:{
+                return [
+                    <span className={props.action} key={1}> move card </span>,
+                    <span className={props.card} key={2}>{item.activity.card}</span>,
+                    <span className={props.action} key={3}> from list </span>,
+                    <span className={props.card} key={4}>{item.activity.oldList}</span>,
+                    <span className={props.action} key={5}> to list </span>,
+                    <span className={props.card} key={6}>{item.activity.newList}</span>,
+                ];
+            }
         }
     };
     return (

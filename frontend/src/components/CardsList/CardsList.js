@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { listDelete, listRename, cardCreate, chooseCard, cardDelete } from '../../redux/actions';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
+import classNames from 'classnames';
+import { listDelete, listRename, cardCreate, chooseCard, cardDelete, replaceCard } from '../../redux/actions';
 import RenameListForm from '../RenameListForm/RenameListForm';
 import ListMenu from '../ListMenu/ListMenu';
 import CardWindow from '../CardWindow/CardWindow';
@@ -12,55 +14,55 @@ const CardsList = (props) => {
     const [isListMenu, changeListMenu] = useState(false);
     const [isCardWindow, changeShowCardWindow] = useState(false);
     const [isAddCard, changeAddCardShow] = useState(false);
+    const baseInfo = {
+        user: props.user.userId,
+        board: props.board,
+        list: props.list.name,
+        listId: props.list.id,
+        authorInfo: {
+            name: props.user.firstName,
+            email: props.user.email,
+        },
+    };
     const renameList = (values) => {
         props.listRename({
             name: values.name,
-            id: props.list.id,
-            oldName: props.list.name,
-            user: props.user.userId,
-            board: props.board,
-            authorInfo:{
-                name:props.user.firstName,
-                email:props.user.email
-            }
+            ...baseInfo,
         });
         changeRenameList(false);
     };
     const deleteList = () => {
         props.listDelete({
-            list: props.list.id,
-            user: props.user.userId,
-            board: props.board,
-            name: props.list.name,
-            authorInfo:{
-                name:props.user.firstName,
-                email:props.user.email
-            }
+            ...baseInfo,
         });
     };
     const createCard = (values) => {
         props.cardCreate({
             ...values,
-            list: props.list.name,
-            listId: props.list.id,
-            user: props.user.userId,
-            board: props.board,
-            authorInfo:{
-                name:props.user.firstName,
-                email:props.user.email
-            }
+            ...baseInfo,
         });
         changeAddCardShow(false);
     };
+
     const getCards = () => {
         const cards = [];
         if (props.cards)
             props.cards.forEach((element) => {
                 if (element.listId === props.list.id)
                     cards.push(
-                        <div className={styles.card} key={element.id} data-id={element.id} onClick={showCardWindow}>
-                            {element.name}
-                        </div>
+                        <Draggable key={element.id} draggableId={element.id} index={element.index}>
+                            {(provided, snapshot) => (
+                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                    <div
+                                        className={classNames(styles.card, { [styles.drag]: snapshot.isDragging })}
+                                        data-id={element.id}
+                                        onClick={showCardWindow}
+                                    >
+                                        {element.name}
+                                    </div>
+                                </div>
+                            )}
+                        </Draggable>
                     );
             });
         return cards;
@@ -80,47 +82,62 @@ const CardsList = (props) => {
     const removeCard = () => {
         props.cardDelete({
             card: props.currentCard.id,
-            board: props.board,
-            list: props.list.name,
-            author: props.user.id,
             name: props.currentCard.name,
-            authorInfo:{
-                name:props.user.firstName,
-                email:props.user.email
-            }
+            ...baseInfo,
         });
         changeShowCardWindow(false);
     };
     return (
         <div className={styles.listContainer}>
-            {!isRenameList && (
-                <div className={styles.titleContainer}>
-                    <div className={styles.listTitle} onDoubleClick={() => changeRenameList(true)}>
-                        {props.list.name}
+            <div>
+                {!isRenameList && (
+                    <div className={styles.titleContainer}>
+                        <div className={styles.listTitle} onDoubleClick={() => changeRenameList(true)}>
+                            {props.list.name}
+                        </div>
+                        <div onClick={() => changeListMenu(true)}>
+                            <span className={styles.listMenu}></span>
+                            <span className={styles.listMenu}></span>
+                            <span className={styles.listMenu}></span>
+                        </div>
+                        {isListMenu && <ListMenu list={props.list.id} close={changeListMenu} delete={deleteList} />}
                     </div>
-                    <div onClick={() => changeListMenu(true)}>
-                        <span className={styles.listMenu}></span>
-                        <span className={styles.listMenu}></span>
-                        <span className={styles.listMenu}></span>
-                    </div>
-                    {isListMenu && <ListMenu list={props.list.id} close={changeListMenu} delete={deleteList} />}
-                </div>
-            )}
-            {isRenameList && (
-                <RenameListForm close={() => changeRenameList(false)} onSubmit={renameList} name={props.list.name} />
-            )}
-
-            <div className={styles.cardContainer}>
-                {getCards()}
+                )}
+                {isRenameList && (
+                    <RenameListForm
+                        close={() => changeRenameList(false)}
+                        onSubmit={renameList}
+                        name={props.list.name}
+                    />
+                )}
             </div>
-            {isAddCard ? (
-                <CraeteCardForm onSubmit={createCard} close={() => changeAddCardShow(false)} />
-            ) : (
-                <button className={styles.btnAddCard} onClick={() => changeAddCardShow(true)}>
-                    Add a card...
-                </button>
-            )}
-            {isCardWindow && <CardWindow close={() => changeShowCardWindow(false)} remove={removeCard} />}
+            <Droppable droppableId={props.list.id}>
+                {(provided, snapshot) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps} className={styles.droppable}>
+                        {getCards()}
+                     {provided.placeholder}
+                        {props.list.id === props.placeholderProps.droppableId && snapshot.isDraggingOver && (
+                            <div className={styles.placeholder}
+                                style={{
+                                    position: 'absolute',
+                                    top: props.placeholderProps.clientY,
+                                    left: props.placeholderProps.clientX,
+                                    height: props.placeholderProps.clientHeight,                                   
+                                    width: props.placeholderProps.clientWidth,
+                                }}
+                            />
+                        )}
+                        {isAddCard ? (
+                            <CraeteCardForm onSubmit={createCard} close={() => changeAddCardShow(false)} />
+                        ) : (
+                            <button className={styles.btnAddCard} onClick={() => changeAddCardShow(true)}>
+                                Add a card...
+                            </button>
+                        )}
+                        {isCardWindow && <CardWindow close={() => changeShowCardWindow(false)} remove={removeCard} />}
+                    </div>
+                )}
+            </Droppable>
         </div>
     );
 };

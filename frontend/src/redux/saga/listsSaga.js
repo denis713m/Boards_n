@@ -3,7 +3,7 @@ import * as activityTypes from '../../utils/activityTypes';
 import { put } from 'redux-saga/effects';
 import { v4 as uuidv4 } from 'uuid';
 import { select } from 'redux-saga/effects';
-import { saveListToStorage, getListsFromStorage, writeActivity, activityType } from '../../utils/storageFunctions';
+import { saveListToStorage, getListsFromStorage, writeActivity, deleteCardsByList } from '../../utils/storageFunctions';
 
 export function* createList(action) {
     yield put({ type: types.LIST_REQUEST });
@@ -46,29 +46,33 @@ export function* deleteList(action) {
     try {
         const lists = getListsFromStorage();
         const newLists = lists.filter(
-            (element) => element.id !== action.payload.list || element.user !== action.payload.user
+            (element) => element.id !== action.payload.listId || element.user !== action.payload.user
         );
         if (lists.length === newLists.length) throw new Error('You don t have rights');
         window.localStorage.setItem('lists', JSON.stringify(newLists));
+        deleteCardsByList([action.payload.listId]);
         const activity = writeActivity(
             {
                 type: activityTypes.DELETE_LIST,
-                list: action.payload.name,
+                list: action.payload.list,
             },
             action.payload.user,
             action.payload.board,
             action.payload.authorInfo
         );
-        const { list } = yield select();
+        const { list, card } = yield select();
         const stateList = list.lists.filter(
-            (element) => element.id !== action.payload.list || element.user !== action.payload.user
-        );
+            (element) => element.id !== action.payload.listId );
+        const stateCard = card.cards.filter(
+            (element) => element.listId !== action.payload.listId);
         yield put({
             type: types.LIST_DELETE_SUCCESS,
             data: stateList,
-            activity: activity
+            activity: activity, 
+            cards:stateCard,
         });
     } catch (e) {
+        console.log(e);
         yield put({
             type: types.LIST_OPERATION_ERROR,
             error: e.response,
@@ -81,7 +85,7 @@ export function* renameList(action) {
     try {
         const lists = getListsFromStorage();
         lists.forEach((element) => {
-            if (element.id === action.payload.id && element.user === action.payload.user) {
+            if (element.id === action.payload.listId && element.user === action.payload.user) {
                 element.name = action.payload.name;
             }
         });
@@ -89,7 +93,7 @@ export function* renameList(action) {
         const activity = writeActivity(
             {
                 type: activityTypes.RENAME_LIST,
-                list: action.payload.oldName,
+                list: action.payload.list,
                 newName: action.payload.name,
             },
             action.payload.user,
@@ -98,7 +102,7 @@ export function* renameList(action) {
         );
         const { list } = yield select();
         list.lists.forEach((element) => {
-            if (element.id === action.payload.id && element.user === action.payload.user) {
+            if (element.id === action.payload.listId && element.user === action.payload.user) {
                 element.name = action.payload.name;
             }
         });

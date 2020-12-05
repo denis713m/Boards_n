@@ -11,6 +11,7 @@ import CreateListForm from '../../components/CreateListForm/CreateListForm';
 import Spinner from '../../components/Spinner/Spinner';
 import CardsList from '../../components/CardsList/CardsList';
 import BoardMenu from '../../components/BoardMenu/BoardMenu';
+import TryAgain from '../../components/TryAgain/TryAgain';
 
 const BoardPage = (props) => {
     const params = Number(useParams().id);
@@ -29,6 +30,7 @@ const BoardPage = (props) => {
         };
     const [isRenameBoard, changeRenameBoard] = useState(false);
     const [isBoardMenu, changeBoardMenu] = useState(false);
+    const [placeholderProps, setPlaceholderProps] = useState({});
 
     const changeBoardName = (values) => {
         props.renameBoard({
@@ -54,7 +56,9 @@ const BoardPage = (props) => {
         });
     };
     const getLists = () => {
-        return props.lists.map((element) => <CardsList list={element} key={element.id} />);
+        return props.lists.map((element) => (
+            <CardsList list={element} key={element.id} placeholderProps={placeholderProps} />
+        ));
     };
 
     const showRenameBoard = () => {
@@ -62,7 +66,6 @@ const BoardPage = (props) => {
     };
 
     const onDragEnd = (result) => {
-        console.log(result);
         const { source, destination } = result;
 
         if (!destination) {
@@ -79,6 +82,41 @@ const BoardPage = (props) => {
                 ...baseInfo,
             });
         }
+        setPlaceholderProps({});
+    };
+    const queryAttrDraggable = 'data-rbd-drag-handle-draggable-id';
+    const queryAttrDroppable = 'data-rbd-droppable-id';
+    const getDom = (id, queryAttr) => {
+        const domQuery = `[${queryAttr}='${id}']`;
+        const DOM = document.querySelector(domQuery);    
+        return DOM;
+      };
+    const onDragUpdate = (update) => {
+        
+        if (!update.destination) {
+            return;
+        }
+        const destinationIndex = update.destination.index;
+
+        const draggedDOM = getDom(update.draggableId, queryAttrDraggable);
+        const droppableDOM = getDom(update.destination.droppableId, queryAttrDroppable);
+        if (!draggedDOM) {
+            return;
+        }
+        const { clientHeight, clientWidth } = draggedDOM;
+
+        const clientY =
+            parseFloat(window.getComputedStyle(draggedDOM.parentNode).paddingTop) +
+            [...droppableDOM.children].slice(0, destinationIndex).reduce((total, curr) => {
+                return total + curr.clientHeight + 5;
+            }, 0);
+        setPlaceholderProps({
+            clientHeight,
+            clientWidth,
+            clientY: clientY - 12.5,
+            clientX: parseFloat(window.getComputedStyle(draggedDOM.parentNode).paddingLeft),
+            droppableId: update.destination.droppableId,
+        });
     };
 
     return (
@@ -88,10 +126,9 @@ const BoardPage = (props) => {
                 {props.isFetching ? (
                     <Spinner />
                 ) : props.error ? (
-                    <div onClick={() => props.getBoardById(params)}> Server error Try again </div>
+                    <TryAgain getData={() => props.getBoardById(params)} />
                 ) : (
                     <>
-                        {console.log(props)}
                         <div className={styles.containerHeader}>
                             {!isRenameBoard && <span onDoubleClick={showRenameBoard}>{props.board.name}</span>}
                             {isRenameBoard && (
@@ -110,7 +147,7 @@ const BoardPage = (props) => {
                                 <BoardMenu close={() => changeBoardMenu(false)} deleteBoard={deleteBoard} />
                             )}
                         </div>
-                        <DragDropContext onDragEnd={onDragEnd}>
+                        <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
                             <div className={styles.listsContainer}>
                                 {getLists()}
                                 <CreateListForm onSubmit={createList} />

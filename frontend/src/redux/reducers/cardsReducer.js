@@ -53,6 +53,21 @@ export default function (state = initialState, action) {
                 error: null,
             };
         }
+        case types.CARD_REPLACE_SUCCESS:
+        case types.CARD_REPLACE_IN_LIST_SUCCESS: {
+            return {
+                ...state,
+                isFetching: false,
+                cards: [...action.data],
+                error: null,
+            };
+        }
+        case types.LIST_DELETE_SUCCESS: {
+            return {
+                ...state,
+                cards: [...action.cards],
+            };
+        }
         case types.CARD_OPERATION_ERROR: {
             return {
                 ...state,

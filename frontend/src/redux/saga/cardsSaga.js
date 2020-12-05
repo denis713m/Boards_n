@@ -3,6 +3,7 @@ import * as activitiTypes from '../../utils/activityTypes';
 import { put } from 'redux-saga/effects';
 import { v4 as uuidv4 } from 'uuid';
 import { select } from 'redux-saga/effects';
+import _ from 'lodash';
 import { saveCardToStorage, getCardsFromStorage, writeActivity } from '../../utils/storageFunctions';
 
 export function* createCard(action) {
@@ -19,7 +20,7 @@ export function* createCard(action) {
             listId: action.payload.listId,
             boardId: action.payload.board,
         };
-        saveCardToStorage(newCard);
+        const index = yield saveCardToStorage(newCard);
         const activity = writeActivity(
             {
                 type: activitiTypes.CREATE_CARD,
@@ -33,7 +34,7 @@ export function* createCard(action) {
         );
         yield put({
             type: types.CARD_CREATE_SUCCESS,
-            data: newCard,
+            data: { ...newCard, index: index },
             activity: activity,
         });
     } catch (e) {
@@ -46,7 +47,6 @@ export function* createCard(action) {
 }
 
 export function* deleteCard(action) {
-    yield put({ type: types.CARD_REQUEST });
     try {
         const cards = getCardsFromStorage();
         const newCards = cards.filter((element) => element.id !== action.payload.card);
@@ -77,7 +77,6 @@ export function* deleteCard(action) {
 }
 
 export function* createComment(action) {
-    yield put({ type: types.CARD_REQUEST });
     try {
         const activity = writeActivity(
             {
@@ -103,7 +102,6 @@ export function* createComment(action) {
 }
 
 export function* addDescription(action) {
-    yield put({ type: types.CARD_REQUEST });
     try {
         const cards = getCardsFromStorage();
         cards.forEach((element) => {
@@ -119,8 +117,76 @@ export function* addDescription(action) {
         yield put({
             type: types.CARD_ADD_DESCRIPTION_SUCCESS,
             data: card.cards,
-            description: action.payload.description
+            description: action.payload.description,
         });
+    } catch (e) {
+        yield put({
+            type: types.CARD_OPERATION_ERROR,
+            error: e.response,
+        });
+    }
+}
+
+export function* replaceCard(action) {
+    try {
+        const cards = getCardsFromStorage();
+        cards.forEach((element) => {
+            if (element.id === action.payload.cardId) {
+                element.listId = action.payload.newListId;
+                element.index = action.payload.newIndex;
+            }
+            if (element.listId === action.payload.oldListId && element.id !== action.payload.cardId) {
+                if (element.index > action.payload.oldIndex) element.index = element.index - 1;
+            }
+            if (element.listId === action.payload.newListId && element.id !== action.payload.cardId) {
+                if (element.index >= action.payload.newIndex) element.index = element.index + 1;
+            }
+        });
+        window.localStorage.setItem('cards', JSON.stringify(cards));
+        const { list, card } = yield select();
+        let cardName, oldList, newList;
+        card.cards.forEach((element) => {
+            if (element.id === action.payload.cardId) {
+                element.listId = action.payload.newListId;
+                element.index = action.payload.newIndex;
+                cardName = element.name;
+            }
+            if (element.listId === action.payload.oldListId && element.id !== action.payload.cardId) {
+                if (element.index > action.payload.oldIndex) element.index = element.index - 1;
+            }
+            if (element.listId === action.payload.newListId && element.id !== action.payload.cardId) {
+                if (element.index >= action.payload.newIndex) element.index = element.index + 1;
+            }
+        });
+        const newCards = _.sortBy(card.cards, ['index']);
+        if (action.payload.oldListId !== action.payload.newListId) {
+            list.lists.forEach((element) => {
+                if (element.id === oldList) oldList = element.name;
+                if (element.id === action.payload.newListId) newList = element.name;
+            });
+            const activity = writeActivity(
+                {
+                    type: activitiTypes.REPLACE_CARD,
+                    card: cardName,
+                    newList: newList,
+                    oldList: oldList,
+                },
+                action.payload.user,
+                action.payload.board,
+                action.payload.authorInfo,
+                action.payload.cardId
+            );
+            yield put({
+                type: types.CARD_REPLACE_SUCCESS,
+                data: newCards,
+                activity: activity,
+            });
+        } else {
+            yield put({
+                type: types.CARD_REPLACE_IN_LIST_SUCCESS,
+                data: newCards,                
+            });
+        }
     } catch (e) {
         yield put({
             type: types.CARD_OPERATION_ERROR,

@@ -83,3 +83,7 @@ export const deleteListByBoard = (boardId) => {
     const newActivity = activity.filter((activity) => activity.boardId !== boardId);
     window.localStorage.setItem('activities', JSON.stringify(newActivity));
 };
+
+export const getUsersFromStorage = () => {
+    return JSON.parse(window.localStorage.getItem('users') || '[]');
+};

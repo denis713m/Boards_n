@@ -21,6 +21,9 @@ const RenameBoardForm = (props) => {
                 <button type='submit' className={styles.btnRenameBoard}>
                     <span className={styles.submitBtn}>Rename</span>
                 </button>
+                <button className={styles.btnResetName} onClick={props.close}>
+                    X
+                </button>
             </form>
 
 

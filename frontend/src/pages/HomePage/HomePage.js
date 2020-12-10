@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link,  withRouter} from 'react-router-dom';
+import fp from 'lodash/fp';
 import styles from './HomePage.module.sass';
 import Icon from '@mdi/react';
 import { mdiAccountOutline } from '@mdi/js';
@@ -22,8 +23,7 @@ const HomePage = (props) => {
     };
 
     const handleSubmit = (values) => {
-        props.createBoard({ name: values.name, user: props.user.userId });
-        closeCreationPanel();
+        props.createBoard({ name: values.name, user: props.user.userId, history: props.history });
     };
 
     const showBoards = () => {
@@ -63,4 +63,4 @@ const mapDispatchToProps = {
     getBoards: getBoards,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default fp.flow(withRouter, connect(mapStateToProps, mapDispatchToProps))(HomePage);

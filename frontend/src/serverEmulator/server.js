@@ -28,7 +28,7 @@ import {
 } from '../utils/storageFunctions';
 
 export default {
-    registrationUser: (data) =>{
+    registrationUser: (data) => {
         const password = hashPass(data.password);
         const token = generateTokens(newUser);
         const newUser = {
@@ -36,14 +36,14 @@ export default {
             lastName: data.lastName,
             displayName: data.displayName,
             email: data.email,
-            password: password, 
-            token: token
+            password: password,
+            token: token,
         };
-        const userId = registerUser(newUser);        
-        return {token, };
+        const userId = registerUser(newUser);
+        return { token };
     },
 
-    login: (data) =>{
+    login: (data) => {
         const user = getUserByEmail(data.email);
         passwordCompare(data.password, user.password);
         const token = generateTokens(user);
@@ -52,7 +52,7 @@ export default {
         return user;
     },
 
-    getUser: (data) =>{
+    getUser: (data) => {
         const tokenData = jwt.verify(data, CONSTANTS.SECRET_FOR_TOKEN);
         const user = getUserById(tokenData.userId);
         delete user.password;
@@ -177,13 +177,10 @@ export default {
     replaceCard: (data) => {
         const cards = getCardsFromStorage();
         const cardsToDecreaseIndex = cards.filter(
-            (card) => card.listId === data.oldListId && card.id !== data.cardId && card.index > data.oldIndex
+            (card) => data.newListId !== data.oldListId && card.id !== data.cardId && card.index > data.oldIndex
         );
         const cardsToIncreaseIndex = cards.filter(
-            (card) =>
-                card.listId === data.newListId &&
-                card.id !== data.cardId &&
-                (data.newListId === data.oldListId ? card.index > data.newIndex : card.index >= data.newIndex)
+            (card) => card.listId === data.newListId && card.id !== data.cardId && card.index >= data.newIndex
         );
         const cardToReplace = _.find(cards, { id: data.cardId });
         cardsToDecreaseIndex.forEach((card) => (card.index = card.index - 1));
@@ -191,22 +188,42 @@ export default {
         cardToReplace.index = data.newIndex;
         cardToReplace.listId = data.newListId;
         window.localStorage.setItem('cards', JSON.stringify(cards));
-        if (data.oldListId !== data.newListId) {
-            const newActivity = writeActivity(
-                {
-                    type: activityTypes.REPLACE_CARD,
-                    card: cardToReplace.name,
-                    newList: data.newList,
-                    oldList: data.oldList,
-                },
-                data.user,
-                data.board,
-                data.authorInfo,
-                data.cardId
-            );
-            return { id: newActivity.id, time: newActivity.time };
-        }
-        return true;
+        const newActivity = writeActivity(
+            {
+                type: activityTypes.REPLACE_CARD,
+                card: cardToReplace.name,
+                newList: data.newList,
+                oldList: data.oldList,
+            },
+            data.user,
+            data.board,
+            data.authorInfo,
+            data.cardId
+        );
+        return { id: newActivity.id, time: newActivity.time };
+    },
+
+    replaceCardInList: (data) => {
+        const cards = getCardsFromStorage();
+        const cardsToDecreaseIndex = cards.filter(
+            (card) =>
+                card.listId === data.listId &&
+                card.id !== data.cardId &&
+                card.index > data.oldIndex &&
+                card.index <= data.newIndex
+        );
+        const cardsToIncreaseIndex = cards.filter(
+            (card) =>
+                card.listId === data.listId &&
+                card.id !== data.cardId &&
+                card.index < data.oldIndex &&
+                card.index >= data.newIndex
+        );
+        const cardToReplace = _.find(cards, { id: data.cardId });
+        cardsToDecreaseIndex.forEach((card) => (card.index = card.index - 1));
+        cardsToIncreaseIndex.forEach((card) => (card.index = card.index + 1));
+        cardToReplace.index = data.newIndex;
+        window.localStorage.setItem('cards', JSON.stringify(cards));
     },
 
     addDescription: (data) => {

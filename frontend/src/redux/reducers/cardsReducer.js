@@ -68,6 +68,12 @@ export default function (state = initialState, action) {
                 cards: [...action.cards],
             };
         }
+        case types.ADD_COMMENT_SUCCESS: {
+            return {
+                ...state,
+                isFetching: false,
+            };
+        }
         case types.CARD_OPERATION_ERROR: {
             return {
                 ...state,

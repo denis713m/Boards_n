@@ -42,9 +42,16 @@ export default function (state = initialState, action) {
                 lists: [...action.data],
                 error: null,
             };
+        }      
+      case types.LIST_OPERATION_ERROR:{
+        return{
+            ...state,
+            isFetching: false,
+            error: action.error
         }
-        default: {
-            return state;
+      }    
+      default:{
+        return state;
         }
     }
 }

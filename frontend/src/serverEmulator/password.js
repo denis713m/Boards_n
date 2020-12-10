@@ -13,6 +13,6 @@ export const hashPass = (password) => {
 export const passwordCompare = (pass1, pass2) => {
   const passwordCompare = bcrypt.compareSync(pass1, pass2);
   if ( !passwordCompare) {
-    throw new Error('WRONG_PASSWORD');
+    throw new Error('WRONG_PASS');
   }
 };

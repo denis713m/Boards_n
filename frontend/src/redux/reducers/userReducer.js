@@ -25,11 +25,11 @@ export default function (state = initialState, action) {
             };
         }
         case types.LOG_OUT: {
-            window.localStorage.removeItem('accessToken');
+
             return {
                 ...state,
                 isFetching: false,
-                error: true,
+                error: null,
                 user: null,
             };
         }

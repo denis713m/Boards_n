@@ -135,7 +135,7 @@ export function* replaceCard(action) {
         const newList = _.find(list.lists, { id: action.payload.newListId }).name;
         const activity = yield server.replaceCard({ ...action.payload, oldList, newList });
         const cardsToDecreaseIndex = card.cards.filter(
-            (card) =>
+            (card) =>                
                 card.listId === action.payload.oldListId &&
                 card.id !== action.payload.cardId &&
                 card.index > action.payload.oldIndex
@@ -144,9 +144,7 @@ export function* replaceCard(action) {
             (card) =>
                 card.listId === action.payload.newListId &&
                 card.id !== action.payload.cardId &&
-                (action.payload.newListId === action.payload.oldListId
-                    ? card.index > action.payload.newIndex
-                    : card.index >= action.payload.newIndex)
+                card.index >= action.payload.newIndex
         );
         const cardToReplace = _.find(card.cards, { id: action.payload.cardId });
         cardsToDecreaseIndex.forEach((card) => (card.index = card.index - 1));
@@ -154,31 +152,60 @@ export function* replaceCard(action) {
         cardToReplace.index = action.payload.newIndex;
         cardToReplace.listId = action.payload.newListId;
         const newCards = _.sortBy(card.cards, ['index']);
-        if (action.payload.oldListId !== action.payload.newListId) {
-            yield put({
-                type: types.CARD_REPLACE_SUCCESS,
-                data: newCards,
+        yield put({
+            type: types.CARD_REPLACE_SUCCESS,
+            data: newCards,
+            activity: {
                 activity: {
-                    activity: {
-                        type: activitiTypes.REPLACE_CARD,
-                        card: cardToReplace.name,
-                        newList: newList,
-                        oldList: oldList,
-                    },
-                    id: activity.id,
-                    userId: action.payload.user,
-                    boardId: action.payload.board,
-                    authorInfo: action.payload.authorInfo, //temporary information about author(email, name) after using server this information will be gotten from user.table
-                    time: activity.time,
-                    cardId: action.payload.cardId,
+                    type: activitiTypes.REPLACE_CARD,
+                    card: cardToReplace.name,
+                    newList: newList,
+                    oldList: oldList,
                 },
-            });
-        } else {
-            yield put({
-                type: types.CARD_REPLACE_IN_LIST_SUCCESS,
-                data: newCards,
-            });
-        }
+                id: activity.id,
+                userId: action.payload.user,
+                boardId: action.payload.board,
+                authorInfo: action.payload.authorInfo, //temporary information about author(email, name) after using server this information will be gotten from user.table
+                time: activity.time,
+                cardId: action.payload.cardId,
+            },
+        });
+    } catch (e) {
+        yield put({
+            type: types.CARD_OPERATION_ERROR,
+            error: e.message,
+        });
+    }
+}
+
+export function* replaceCardInList(action) {
+    yield put({ type: types.CARD_REQUEST });
+    try {
+        const { card } = yield select();
+        yield server.replaceCardInList({ ...action.payload });
+        const cardsToDecreaseIndex = card.cards.filter(
+            (card) =>
+                card.listId === action.payload.listId &&
+                card.id !== action.payload.cardId &&
+                card.index > action.payload.oldIndex &&
+                card.index <= action.payload.newIndex
+        );
+        const cardsToIncreaseIndex = card.cards.filter(
+            (card) =>
+                card.listId === action.payload.listId &&
+                card.id !== action.payload.cardId &&
+                card.index < action.payload.oldIndex &&
+                card.index >= action.payload.newIndex
+        );
+        const cardToReplace = _.find(card.cards, { id: action.payload.cardId });
+        cardsToDecreaseIndex.forEach((card) => (card.index = card.index - 1));
+        cardsToIncreaseIndex.forEach((card) => (card.index = card.index + 1));
+        cardToReplace.index = action.payload.newIndex;
+        const newCards = _.sortBy(card.cards, ['index']);
+        yield put({
+            type: types.CARD_REPLACE_IN_LIST_SUCCESS,
+            data: newCards,
+        });
     } catch (e) {
         yield put({
             type: types.CARD_OPERATION_ERROR,

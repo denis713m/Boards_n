@@ -38,3 +38,5 @@ export const createComment = createAction(types.CREATE_COMMENT)
 export const addDescription = createAction(types.CARD_ADD_DESCRIPTION)
 
 export const replaceCard = createAction(types.CARD_REPLACE)
+
+export const replaceCardInList = createAction(types.CARD_REPLACE_IN_LIST);

@@ -39,7 +39,7 @@ export default function (state = initialState, action) {
             };
         }
         case types.BOARD_DELETE_SUCCESS: {
-            return { ...state, isFetching: false, currentBoard: {}, boards: [...action.data], error: null };
+            return { ...state, isFetching: false, currentBoard: {}, boards: [], error: null };
         }
         case types.LIST_CREATE_SUCCESS:
         case types.LIST_DELETE_SUCCESS:
@@ -53,7 +53,6 @@ export default function (state = initialState, action) {
                 activities: [action.activity, ...state.activities],
             };
         }
-
         case types.BOARD_OPERATION_ERROR: {
             return {
                 ...state,

@@ -1,196 +1,188 @@
 import * as types from '../actionTypes';
 import * as activitiTypes from '../../utils/activityTypes';
 import { put } from 'redux-saga/effects';
-import { v4 as uuidv4 } from 'uuid';
 import { select } from 'redux-saga/effects';
 import _ from 'lodash';
-import { saveCardToStorage, getCardsFromStorage, writeActivity } from '../../utils/storageFunctions';
+import { stopSubmit } from 'redux-form';
+import ERROR_MESSAGES from '../../ERROR_CONSTANTS';
+import server from '../../serverEmulator/server';
 
 export function* createCard(action) {
     yield put({ type: types.CARD_REQUEST });
     try {
         const { card } = yield select();
-        card.cards.forEach((card) => {
-            if (card.name === action.payload.name) throw new Error('Wrong name');
-        });
-        const newCard = {
-            name: action.payload.name,
-            userId: action.payload.user,
-            id: uuidv4(),
-            listId: action.payload.listId,
-            boardId: action.payload.board,
-        };
-        const index = yield saveCardToStorage(newCard);
-        const activity = writeActivity(
-            {
-                type: activitiTypes.CREATE_CARD,
-                card: action.payload.name,
-                list: action.payload.list,
-            },
-            action.payload.user,
-            action.payload.board,
-            action.payload.authorInfo,
-            newCard.id
-        );
+        const sameNameCard = _.find(card.cards, { name: action.payload.name });
+        if (!_.isUndefined(sameNameCard)) throw new Error('CARD_EXIST');
+        const { index, id, activityId, activityTime } = yield server.createCard(action.payload);
         yield put({
             type: types.CARD_CREATE_SUCCESS,
-            data: { ...newCard, index: index },
-            activity: activity,
+            data: {
+                name: action.payload.name,
+                userId: action.payload.user,
+                listId: action.payload.listId,
+                boardId: action.payload.board,
+                index: index,
+                id: id,
+            },
+            activity: {
+                activity: {
+                    type: activitiTypes.CREATE_CARD,
+                    card: action.payload.name,
+                    list: action.payload.list,
+                },
+                id: activityId,
+                userId: action.payload.user,
+                boardId: action.payload.board,
+                authorInfo: action.payload.authorInfo, //temporary information about author(email, name) after using server this information will be gotten from user.table
+                cardId: id,
+                time: activityTime,
+            },
         });
+        action.payload.showCreateCardForm(false);
     } catch (e) {
-        console.log(e);
+        if (e.message === 'CARD_EXIST') yield put(stopSubmit('createCard', { name: ERROR_MESSAGES.CARD_EXIST }));
+        else yield put(stopSubmit('createCard', { name: ERROR_MESSAGES.default }));
         yield put({
             type: types.CARD_OPERATION_ERROR,
-            error: e,
         });
     }
 }
 
 export function* deleteCard(action) {
+    yield put({ type: types.CARD_REQUEST });
     try {
-        const cards = getCardsFromStorage();
-        const newCards = cards.filter((element) => element.id !== action.payload.card);
-        window.localStorage.setItem('cards', JSON.stringify(newCards));
-        const activity = writeActivity(
-            {
-                type: activitiTypes.DELETE_CARD,
-                card: action.payload.name,
-                list: action.payload.list,
-            },
-            action.payload.user,
-            action.payload.board,
-            action.payload.authorInfo
-        );
+        const activity = yield server.deleteCard(action.payload);
         const { card } = yield select();
         const stateCard = card.cards.filter((element) => element.id !== action.payload.card);
         yield put({
             type: types.CARD_DELETE_SUCCESS,
             data: stateCard,
-            activity: activity,
+            activity: {
+                activity: {
+                    type: activitiTypes.DELETE_CARD,
+                    card: action.payload.name,
+                    list: action.payload.list,
+                },
+                id: activity.id,
+                userId: action.payload.user,
+                boardId: action.payload.board,
+                authorInfo: action.payload.authorInfo, //temporary information about author(email, name) after using server this information will be gotten from user.table
+                time: activity.time,
+            },
         });
     } catch (e) {
         yield put({
             type: types.CARD_OPERATION_ERROR,
-            error: e.response,
+            error: e.message,
         });
     }
 }
 
 export function* createComment(action) {
+    yield put({ type: types.CARD_REQUEST });
     try {
-        const activity = writeActivity(
-            {
-                type: activitiTypes.ADD_COMMENT,
-                card: action.payload.name,
-                comment: action.payload.comment,
-            },
-            action.payload.user,
-            action.payload.board,
-            action.payload.authorInfo,
-            action.payload.cardId
-        );
+        const activity = yield server.createComment(action.payload);
         yield put({
             type: types.ADD_COMMENT_SUCCESS,
-            activity: activity,
+            activity: {
+                activity: {
+                    type: activitiTypes.ADD_COMMENT,
+                    card: action.payload.name,
+                    comment: action.payload.comment,
+                },
+                id: activity.id,
+                userId: action.payload.user,
+                boardId: action.payload.board,
+                authorInfo: action.payload.authorInfo, //temporary information about author(email, name) after using server this information will be gotten from user.table
+                time: activity.time,
+                cardId: action.payload.cardId,
+            },
         });
     } catch (e) {
+        yield put(stopSubmit('createComment', { name: ERROR_MESSAGES.default }));
         yield put({
             type: types.CARD_OPERATION_ERROR,
-            error: e.response,
         });
     }
 }
 
 export function* addDescription(action) {
+    yield put({ type: types.CARD_REQUEST });
     try {
-        const cards = getCardsFromStorage();
-        cards.forEach((element) => {
-            if (element.id === action.payload.card && element.userId === action.payload.user)
-                element.description = action.payload.description;
-        });
-        window.localStorage.setItem('cards', JSON.stringify(cards));
+        yield server.addDescription(action.payload);
         const { card } = yield select();
-        card.cards.forEach((element) => {
-            if (element.id === action.payload.card && element.userId === action.payload.user)
-                element.description = action.payload.description;
-        });
+        const stateCard = _.find(card.cards, { id: action.payload.card, userId: action.payload.user });
+        stateCard.description = action.payload.description;
         yield put({
             type: types.CARD_ADD_DESCRIPTION_SUCCESS,
             data: card.cards,
             description: action.payload.description,
         });
     } catch (e) {
+        if (e.message === 'NO_RIGHTS') yield put(stopSubmit('createDescription', { name: ERROR_MESSAGES.NO_RIGHTS }));
+        else yield put(stopSubmit('createDescription', { name: ERROR_MESSAGES.default }));
         yield put({
             type: types.CARD_OPERATION_ERROR,
-            error: e.response,
         });
     }
 }
 
 export function* replaceCard(action) {
+    yield put({ type: types.CARD_REQUEST });
     try {
-        const cards = getCardsFromStorage();
-        cards.forEach((element) => {
-            if (element.id === action.payload.cardId) {
-                element.listId = action.payload.newListId;
-                element.index = action.payload.newIndex;
-            }
-            if (element.listId === action.payload.oldListId && element.id !== action.payload.cardId) {
-                if (element.index > action.payload.oldIndex) element.index = element.index - 1;
-            }
-            if (element.listId === action.payload.newListId && element.id !== action.payload.cardId) {
-                if (element.index >= action.payload.newIndex) element.index = element.index + 1;
-            }
-        });
-        window.localStorage.setItem('cards', JSON.stringify(cards));
         const { list, card } = yield select();
-        let cardName, oldList, newList;
-        card.cards.forEach((element) => {
-            if (element.id === action.payload.cardId) {
-                element.listId = action.payload.newListId;
-                element.index = action.payload.newIndex;
-                cardName = element.name;
-            }
-            if (element.listId === action.payload.oldListId && element.id !== action.payload.cardId) {
-                if (element.index > action.payload.oldIndex) element.index = element.index - 1;
-            }
-            if (element.listId === action.payload.newListId && element.id !== action.payload.cardId) {
-                if (element.index >= action.payload.newIndex) element.index = element.index + 1;
-            }
-        });
+        const oldList = _.find(list.lists, { id: action.payload.oldListId }).name;
+        const newList = _.find(list.lists, { id: action.payload.newListId }).name;
+        const activity = yield server.replaceCard({ ...action.payload, oldList, newList });
+        const cardsToDecreaseIndex = card.cards.filter(
+            (card) =>
+                card.listId === action.payload.oldListId &&
+                card.id !== action.payload.cardId &&
+                card.index > action.payload.oldIndex
+        );
+        const cardsToIncreaseIndex = card.cards.filter(
+            (card) =>
+                card.listId === action.payload.newListId &&
+                card.id !== action.payload.cardId &&
+                (action.payload.newListId === action.payload.oldListId
+                    ? card.index > action.payload.newIndex
+                    : card.index >= action.payload.newIndex)
+        );
+        const cardToReplace = _.find(card.cards, { id: action.payload.cardId });
+        cardsToDecreaseIndex.forEach((card) => (card.index = card.index - 1));
+        cardsToIncreaseIndex.forEach((card) => (card.index = card.index + 1));
+        cardToReplace.index = action.payload.newIndex;
+        cardToReplace.listId = action.payload.newListId;
         const newCards = _.sortBy(card.cards, ['index']);
         if (action.payload.oldListId !== action.payload.newListId) {
-            list.lists.forEach((element) => {
-                if (element.id === oldList) oldList = element.name;
-                if (element.id === action.payload.newListId) newList = element.name;
-            });
-            const activity = writeActivity(
-                {
-                    type: activitiTypes.REPLACE_CARD,
-                    card: cardName,
-                    newList: newList,
-                    oldList: oldList,
-                },
-                action.payload.user,
-                action.payload.board,
-                action.payload.authorInfo,
-                action.payload.cardId
-            );
             yield put({
                 type: types.CARD_REPLACE_SUCCESS,
                 data: newCards,
-                activity: activity,
+                activity: {
+                    activity: {
+                        type: activitiTypes.REPLACE_CARD,
+                        card: cardToReplace.name,
+                        newList: newList,
+                        oldList: oldList,
+                    },
+                    id: activity.id,
+                    userId: action.payload.user,
+                    boardId: action.payload.board,
+                    authorInfo: action.payload.authorInfo, //temporary information about author(email, name) after using server this information will be gotten from user.table
+                    time: activity.time,
+                    cardId: action.payload.cardId,
+                },
             });
         } else {
             yield put({
                 type: types.CARD_REPLACE_IN_LIST_SUCCESS,
-                data: newCards,                
+                data: newCards,
             });
         }
     } catch (e) {
         yield put({
             type: types.CARD_OPERATION_ERROR,
-            error: e.response,
+            error: e.message,
         });
     }
 }

@@ -8,9 +8,9 @@ const initialState = {
 
 export default function(state = initialState, action) {
     switch (action.type) {
-      case types.LIST_REQUEST:{
-        state.isFetching = true;
-        return {...state}
+      case types.LIST_REQUEST:{        
+        return {...state,
+                isFetching: true}
       }
       case types.LIST_CREATE_SUCCESS:{
         return{
@@ -44,6 +44,13 @@ export default function(state = initialState, action) {
             error: null
         }
       }
+      case types.LIST_OPERATION_ERROR:{
+        return{
+            ...state,
+            isFetching: false,
+            error: action.error
+        }
+      }    
       default:{
         return state;
         }

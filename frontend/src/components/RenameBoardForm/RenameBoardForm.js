@@ -39,7 +39,7 @@ function mapStateToProps(state, ownProps) {
 
 export default connect(mapStateToProps)( reduxForm({
     form: 'renameBoard',
-    enableReinitialize: true,
+    //enableReinitialize: true,
     mapStateToProps,
     validate: customValidator(Schems.CreateBoardSchem)
 })(RenameBoardForm));

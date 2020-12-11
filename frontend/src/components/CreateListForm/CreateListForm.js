@@ -1,5 +1,5 @@
 import React from 'react';
-import { Field, reduxForm, reset } from 'redux-form';
+import { Field, reduxForm } from 'redux-form';
 import FormInput from '../FormInput/FormInput';
 import customValidator from '../../validators/validator';
 import Schems from '../../validators/YupValidator';
@@ -15,12 +15,12 @@ const CreateListForm = (props) => {
                 inputfield={styles.inputfield}
                 warning={styles.fieldWarning}
                 type='text'
-                label='Add a list...' 
+                label='Add a list...'
             />
             <button type='submit' className={styles.btnCreateList}>
                 <span className={styles.submitBtn}>Save</span>
             </button>
-            {!props.pristine && (
+            {(!props.pristine || props.anyTouched) && (
                 <button className={styles.btnResetName} onClick={props.reset}>
                     X
                 </button>
@@ -29,10 +29,7 @@ const CreateListForm = (props) => {
     );
 };
 
-const afterSubmit = (result, dispatch) => dispatch(reset('createList'));
-
 export default reduxForm({
     form: 'createList',
-    onSubmitSuccess: afterSubmit,
     validate: customValidator(Schems.CreateBoardSchem),
 })(CreateListForm);

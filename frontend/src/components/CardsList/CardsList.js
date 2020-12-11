@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
+import _ from 'lodash';
 import { listDelete, listRename, cardCreate, chooseCard, cardDelete, replaceCard } from '../../redux/actions';
 import RenameListForm from '../RenameListForm/RenameListForm';
 import ListMenu from '../ListMenu/ListMenu';
 import CardWindow from '../CardWindow/CardWindow';
 import CraeteCardForm from '../CreateCardForm/CraeteCardForm';
+import Spinner from '../Spinner/Spinner';
 import styles from './CardsList.module.sass';
 
 const CardsList = (props) => {
@@ -16,7 +18,7 @@ const CardsList = (props) => {
     const [isAddCard, changeAddCardShow] = useState(false);
     const baseInfo = {
         user: props.user.userId,
-        board: props.board,
+        board: props.board.id,
         list: props.list.name,
         listId: props.list.id,
         authorInfo: {
@@ -25,54 +27,51 @@ const CardsList = (props) => {
         },
     };
     const renameList = (values) => {
-        props.listRename({
-            name: values.name,
-            ...baseInfo,
-        });
-        changeRenameList(false);
+        if (values.name !== props.list.name) {
+            props.listRename({
+                name: values.name,
+                ...baseInfo,
+                showRenameForm: changeRenameList,
+            });
+        } else {
+            changeRenameList(false);
+        }
     };
     const deleteList = () => {
         props.listDelete({
             ...baseInfo,
+            boardAuthor: props.board.user
         });
     };
     const createCard = (values) => {
         props.cardCreate({
             ...values,
             ...baseInfo,
+            showCreateCardForm: changeAddCardShow,
         });
-        changeAddCardShow(false);
     };
 
-    const getCards = () => {
-        const cards = [];
-        if (props.cards)
-            props.cards.forEach((element) => {
-                if (element.listId === props.list.id)
-                    cards.push(
-                        <Draggable key={element.id} draggableId={element.id} index={element.index}>
-                            {(provided, snapshot) => (
-                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                    <div
-                                        className={classNames(styles.card, { [styles.drag]: snapshot.isDragging })}
-                                        data-id={element.id}
-                                        onClick={showCardWindow}
-                                    >
-                                        {element.name}
-                                    </div>
-                                </div>
-                            )}
-                        </Draggable>
-                    );
-            });
-        return cards;
+    const getCards = () => { 
+        const cardsInList = props.cards.filter((card) => card.listId === props.list.id);
+        return cardsInList.map((card) => (
+            <Draggable key={card.id} draggableId={card.id} index={card.index}>
+                {(provided, snapshot) => (
+                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                        <div
+                            className={classNames(styles.card, { [styles.drag]: snapshot.isDragging })}
+                            data-id={card.id}
+                            onClick={(e) => showCardWindow(e, card.id)}
+                        >
+                            {card.name}
+                        </div>
+                    </div>
+                )}
+            </Draggable>
+        ));
     };
-    const showCardWindow = (e) => {
-        const currentCardId = e.target.getAttribute('data-id');
-        let card = {};
-        props.cards.forEach((item) => {
-            if (item.id === currentCardId) card = item;
-        });
+
+    const showCardWindow = (e, id) => {
+        const card = _.find(props.cards, { id: id });
         card.listName = props.list.name;
         card.userName = props.user.firstName;
         card.userEmail = props.user.email;
@@ -95,12 +94,18 @@ const CardsList = (props) => {
                         <div className={styles.listTitle} onDoubleClick={() => changeRenameList(true)}>
                             {props.list.name}
                         </div>
-                        <div onClick={() => changeListMenu(true)}>
-                            <span className={styles.listMenu}></span>
-                            <span className={styles.listMenu}></span>
-                            <span className={styles.listMenu}></span>
-                        </div>
-                        {isListMenu && <ListMenu list={props.list.id} close={changeListMenu} delete={deleteList} />}
+                        {(props.user.userId === props.list.user || props.user.userId === props.board.user) && (
+                            <>
+                                <div onClick={() => changeListMenu(true)}>
+                                    <span className={styles.listMenu}></span>
+                                    <span className={styles.listMenu}></span>
+                                    <span className={styles.listMenu}></span>
+                                </div>
+                                {isListMenu && (
+                                    <ListMenu list={props.list.id} close={changeListMenu} delete={deleteList} />
+                                )}
+                            </>
+                        )}
                     </div>
                 )}
                 {isRenameList && (
@@ -113,16 +118,22 @@ const CardsList = (props) => {
             </div>
             <Droppable droppableId={props.list.id}>
                 {(provided, snapshot) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps} className={styles.droppable}>
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={styles.droppable}
+                        onClick={() => changeRenameList(false)}
+                    >
                         {getCards()}
-                     {provided.placeholder}
+                        {provided.placeholder}
                         {props.list.id === props.placeholderProps.droppableId && snapshot.isDraggingOver && (
-                            <div className={styles.placeholder}
+                            <div
+                                className={styles.placeholder}
                                 style={{
                                     position: 'absolute',
                                     top: props.placeholderProps.clientY,
                                     left: props.placeholderProps.clientX,
-                                    height: props.placeholderProps.clientHeight,                                   
+                                    height: props.placeholderProps.clientHeight,
                                     width: props.placeholderProps.clientWidth,
                                 }}
                             />
@@ -146,7 +157,7 @@ const mapStateToProps = (state) => {
     return {
         user: state.user.user,
         cards: state.card.cards,
-        board: state.boards.currentBoard.id,
+        board: state.boards.currentBoard,
         currentCard: state.card.currentCard,
     };
 };

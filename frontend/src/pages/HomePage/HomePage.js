@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header';
 import { connect } from 'react-redux';
-import { Link,  withRouter} from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import fp from 'lodash/fp';
 import styles from './HomePage.module.sass';
 import Icon from '@mdi/react';
 import { mdiAccountOutline } from '@mdi/js';
+import Spinner from '../../components/Spinner/Spinner';
 import CreateBoardForm from '../../components/CreateBoardForm/CreateBoardForm';
 import { boardCreate, getBoards } from '../../redux/actions';
 
@@ -43,6 +44,7 @@ const HomePage = (props) => {
                     <p>Personal Boards</p>
                 </div>
                 <div className={styles.boardsContainer}>
+                    {props.boards.isFetching && <Spinner />}
                     {showBoards()}
                     <div className={styles.newBoard} onClick={openCreationPanel}>
                         Create new board...

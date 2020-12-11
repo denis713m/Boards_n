@@ -16,6 +16,7 @@ const CreateBoardForm = (props) => {
                 <Field
                     name='name'
                     component={FormInput}
+                    warning={styles.fieldWarning}
                     type='text'
                     label='Board name'
                 />

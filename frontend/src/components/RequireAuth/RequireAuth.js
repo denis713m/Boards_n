@@ -22,14 +22,14 @@ const RequireAuth = (props) => {
                     props.getUser();
                 }
             }
-        },
-        []);
+    }, []);
 
     return (
         <>
             {PUBLIC_ROUTES.includes(props.location.pathname) ? (
                 <>{props.children}</>
-            ) : !PUBLIC_ROUTES.includes(props.location.pathname) && props.isFetching ? (
+            ) : !PUBLIC_ROUTES.includes(props.location.pathname) && !props.user && !props.error
+             ? (
                 <Spinner />
             ) : props.error ? (
                 <Login />

@@ -1,7 +1,7 @@
 import * as types from '../actionTypes';
 
 const initialState = {
-    isFetching: true,
+    isFetching: false,
     error: false,
     user: null,
 };

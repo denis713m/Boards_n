@@ -1,7 +1,7 @@
 import * as types from '../actionTypes';
 
 const initialState = {
-    isFetching: true,
+    isFetching: false,
     error: false,
     cards: [],
     currentCard: {},
@@ -79,6 +79,13 @@ export default function (state = initialState, action) {
                 ...state,
                 isFetching: false,
                 error: action.error,
+            };
+        }
+        case types.CLEAR_ERRORS: {
+            return {
+                ...state,
+                isFetching: false,
+                error: null,
             };
         }
         default:

@@ -1,6 +1,6 @@
 import { takeLatest, takeEvery } from 'redux-saga/effects';
 import * as types from '../actionTypes';
-import { registrationUser, login, getUser } from './userSagaStorage';
+import { registrationUser, login, getUser } from './userSaga';
 import { createBoards, getBoards, getBoardById, renameBoard, deleteBoard } from './boardsSaga';
 import { createList, deleteList, renameList } from './listsSaga';
 import { createCard, deleteCard, createComment, addDescription, replaceCard, replaceCardInList } from './cardsSaga';

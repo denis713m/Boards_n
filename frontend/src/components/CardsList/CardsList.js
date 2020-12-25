@@ -8,7 +8,6 @@ import RenameListForm from '../RenameListForm/RenameListForm';
 import ListMenu from '../ListMenu/ListMenu';
 import CardWindow from '../CardWindow/CardWindow';
 import CraeteCardForm from '../CreateCardForm/CraeteCardForm';
-import Spinner from '../Spinner/Spinner';
 import styles from './CardsList.module.sass';
 
 const CardsList = (props) => {
@@ -17,8 +16,8 @@ const CardsList = (props) => {
     const [isCardWindow, changeShowCardWindow] = useState(false);
     const [isAddCard, changeAddCardShow] = useState(false);
     const baseInfo = {
-        user: props.user.userId,
-        board: props.board.id,
+        userId: props.user.userId,
+        boardId: props.board.id,
         list: props.list.name,
         listId: props.list.id,
         authorInfo: {
@@ -30,6 +29,7 @@ const CardsList = (props) => {
         if (values.name !== props.list.name) {
             props.listRename({
                 name: values.name,
+                boardAuthor: props.board.user,
                 ...baseInfo,
                 showRenameForm: changeRenameList,
             });
@@ -40,7 +40,7 @@ const CardsList = (props) => {
     const deleteList = () => {
         props.listDelete({
             ...baseInfo,
-            boardAuthor: props.board.user
+            boardAuthor: props.board.user,
         });
     };
     const createCard = (values) => {
@@ -51,10 +51,10 @@ const CardsList = (props) => {
         });
     };
 
-    const getCards = () => { 
+    const getCards = () => {
         const cardsInList = props.cards.filter((card) => card.listId === props.list.id);
         return cardsInList.map((card) => (
-            <Draggable key={card.id} draggableId={card.id} index={card.index}>
+            <Draggable key={card.id} draggableId={`${card.id}`} index={card.index}>
                 {(provided, snapshot) => (
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                         <div
@@ -80,8 +80,7 @@ const CardsList = (props) => {
     };
     const removeCard = () => {
         props.cardDelete({
-            card: props.currentCard.id,
-            name: props.currentCard.name,
+            removeCard: props.currentCard,
             ...baseInfo,
         });
         changeShowCardWindow(false);
@@ -94,7 +93,7 @@ const CardsList = (props) => {
                         <div className={styles.listTitle} onDoubleClick={() => changeRenameList(true)}>
                             {props.list.name}
                         </div>
-                        {(props.user.userId === props.list.user || props.user.userId === props.board.user) && (
+                        {(props.user.userId === props.list.userId || props.user.userId === props.board.user) && (
                             <>
                                 <div onClick={() => changeListMenu(true)}>
                                     <span className={styles.listMenu}></span>
@@ -116,7 +115,7 @@ const CardsList = (props) => {
                     />
                 )}
             </div>
-            <Droppable droppableId={props.list.id}>
+            <Droppable droppableId={`${props.list.id}`}>
                 {(provided, snapshot) => (
                     <div
                         ref={provided.innerRef}
@@ -126,7 +125,7 @@ const CardsList = (props) => {
                     >
                         {getCards()}
                         {provided.placeholder}
-                        {props.list.id === props.placeholderProps.droppableId && snapshot.isDraggingOver && (
+                        {props.list.id == props.placeholderProps.droppableId && snapshot.isDraggingOver && (
                             <div
                                 className={styles.placeholder}
                                 style={{

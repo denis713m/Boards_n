@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './BoardPage.module.sass';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { withRouter, useParams } from 'react-router-dom';
 import fp from 'lodash/fp';
 import { DragDropContext } from 'react-beautiful-dnd';
 import Header from '../../components/Header/Header';
@@ -22,15 +22,15 @@ import TryAgain from '../../components/TryAgain/TryAgain';
 import Error from '../../components/Error/Error';
 
 const BoardPage = (props) => {
-    const params = props.location.pathname.substring(7);
+    const params = Number(useParams().id);
     useEffect(() => {
         props.getBoardById(params);
     }, []);
     let baseInfo;
     if (props.user)
         baseInfo = {
-            board: params,
-            user: props.user.userId,
+            boardId: params,
+            userId: props.user.userId,
             authorInfo: {
                 name: props.user.firstName,
                 email: props.user.email,
@@ -61,6 +61,7 @@ const BoardPage = (props) => {
         props.listCreate({
             ...values,
             ...baseInfo,
+            boardAuthor: props.board.currentBoard.user,
         });
     };
     const getLists = () => {
@@ -81,15 +82,15 @@ const BoardPage = (props) => {
         } else {
             source.droppableId === destination.droppableId
                 ? props.replaceCardInList({
-                      cardId: result.draggableId,
-                      listId: destination.droppableId,
+                      cardId: Number(result.draggableId),
+                      listId: Number(destination.droppableId),
                       oldIndex: source.index,
                       newIndex: destination.index,
                   })
                 : props.replaceCard({
-                      cardId: result.draggableId,
-                      newListId: destination.droppableId,
-                      oldListId: source.droppableId,
+                      cardId: Number(result.draggableId),
+                      newListId: Number(destination.droppableId),
+                      oldListId: Number(source.droppableId),
                       oldIndex: source.index,
                       newIndex: destination.index,
                       ...baseInfo,
@@ -132,12 +133,11 @@ const BoardPage = (props) => {
         <>
             <Header />
             <div className={styles.container}>
-                {props.board.isFetching ? (
-                    <Spinner />
-                ) : props.board.error ? (
+                {props.board.error ? (
                     <TryAgain getData={() => props.getBoardById(params)} errorMessage={props.board.error} />
                 ) : (
                     <>
+                        {props.board.isFetching && <Spinner />}
                         {(props.list.error || props.card.error) && (
                             <Error error={props.list.error ? props.list.error : props.card.error} />
                         )}

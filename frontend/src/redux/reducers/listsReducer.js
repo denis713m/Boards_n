@@ -50,7 +50,14 @@ export default function(state = initialState, action) {
             isFetching: false,
             error: action.error
         }
-      }    
+      }  
+      case types.CLEAR_ERRORS: {
+        return {
+            ...state,
+            isFetching: false,
+            error: null,
+        };
+    }  
       default:{
         return state;
         }

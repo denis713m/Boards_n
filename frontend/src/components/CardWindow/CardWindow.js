@@ -23,27 +23,24 @@ const CardWindow = (props) => {
     const getComments = () => {
         const comments = [];
         props.activities.forEach((item) => {
-            if (item.activity.type === ADD_COMMENT && item.cardId === props.currentCard.id)
+            if (item.type === ADD_COMMENT && item.cardId === props.currentCard.id)
                 comments.push(<Activity key={item.id} item={item} cardWindow={true} />);
         });
         return comments;
     };
     const saveComment = (values) => {
         props.createComment({
+            card:props.currentCard,
             comment: values.name,
-            name: props.currentCard.name,
-            user: props.currentCard.userId,
-            board: props.currentCard.boardId,
             authorInfo: {
                 name: props.currentCard.userName,
                 email: props.currentCard.userEmail,
             },
-            cardId: props.currentCard.id,
         });
     };
     const addDescription = (values) => {
         props.addDescription({
-            card: props.currentCard.id,
+            cardId: props.currentCard.id,
             description: values.name,
             user: props.currentCard.userId,
         });

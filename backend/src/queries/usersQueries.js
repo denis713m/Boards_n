@@ -20,7 +20,7 @@ module.exports.createUser = async (data) => {
 module.exports.loginUser = async (data) => {
   const newUser = await db.User.findOne({where:{email: data}});
   if (!newUser) {
-    throw new Error('Cant find user');
+    throw new Error('NOT_EXIST');
   }
   return newUser.get({ plain: true }); 
 };

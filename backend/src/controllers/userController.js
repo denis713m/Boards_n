@@ -1,14 +1,14 @@
 const db = require('../models');
-const generateTokens = require('../middleware/generateTokens');
+const generateTokens = require('../middleware/tokenMiddleware');
 const passwordMiddleware = require('../middleware/password');
 const userQuerie = require('../queries/usersQueries');
-const jwt = require('jsonwebtoken');
 
 module.exports.registrationUser = async (req, res) => {
     const user = req.body;
-    user.password = req.hashPass;
-    const tokens = generateTokens.generateTokens(user);
-    const newUser = await userQuerie.createUser({ ...user, ...tokens });
+    user.password = req.hashPass;  
+    const newUser = await userQuerie.createUser({ ...user });  
+    const tokens = generateTokens.generateTokens(newUser);
+    await userQuerie.updateUserTokens(tokens, newUser.id);
     res.send({ ...tokens, id: newUser.id });
 };
 
@@ -27,20 +27,14 @@ module.exports.loginUser = async (req, res) => {
     });
 };
 
-module.exports.getUser = async (req, res) => {
-    const accessToken = req.headers.authorization;
-    if (!accessToken) {
-        throw new Error('need token');
-    }
-    const tokenData = jwt.verify(accessToken, 'SECRET_FOR_TOKEN');
-    const userId = tokenData.userId;
+module.exports.getUser = async (req, res) => {  
+    const userId = req.tokenData.userId;
     const user = await userQuerie.getUser(userId);
     res.send({
         firstName: user.firstName,
         userId: user.id,
         lastName: user.lastName,
         displayName: user.displayName,
-        accessToken: user.accessToken,
         email: user.email,
     });
 };

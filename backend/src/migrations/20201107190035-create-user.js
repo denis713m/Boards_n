@@ -30,7 +30,7 @@ module.exports = {
         type: Sequelize.TEXT
       },
       accesToken: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.TEXT
       },      
     });

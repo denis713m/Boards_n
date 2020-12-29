@@ -30,15 +30,11 @@ const HomePage = (props) => {
     };
 
     const showBoards = () =>{
-        const boards = [];
-        props.boards.boards.forEach(element => {
-            boards.push(
-                <Link key={element.id} className={styles.board} to={`/board/${element.id}`}>
-                    {element.name}
-                </Link>  
-            )
-        });
-        return boards;
+        return props.boards.boards.map((element) => (
+            <Link key={element.id} className={styles.board} to={`/board/${element.id}`}>
+                {element.name}
+            </Link>
+        ));
     }
 
     return (

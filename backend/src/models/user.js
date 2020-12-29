@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT
     },
     accessToken: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.TEXT}
   }, {
     sequelize,

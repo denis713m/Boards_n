@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 
-module.exports.hashPass = async (req, res, next) => {
-    req.hashPass = await bcrypt.hash(req.body.password, 5);
+module.exports.hashPass = async (password) => {
+    return await bcrypt.hash(password, 5);
 };
 
 module.exports.passwordCompare = async (pass1, pass2) => {

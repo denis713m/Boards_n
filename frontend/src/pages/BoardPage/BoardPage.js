@@ -44,7 +44,7 @@ const BoardPage = (props) => {
         });
     };
     const getLists = () => {
-        return props.list.lists.map((element) => <CardsList list={element} key={element.id} />);
+        return props.lists.map((element) => <CardsList list={element} key={element.id} />);
     };
 
     const showRenameBoard = () => {

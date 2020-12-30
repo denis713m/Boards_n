@@ -7,8 +7,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports.registrationUser = async (req, res) => {
     const user = req.body;
-    await passwordMiddleware.hashPass();
-    user.password = req.hashPass;
+    user.password = await passwordMiddleware.hashPass(req.body.password);
     const newUser = await userQuerie.createUser({ ...user });
     const tokens = generateTokens.generateTokens(newUser);
     await userQuerie.updateUserTokens(tokens, newUser.id);

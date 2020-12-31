@@ -8,13 +8,11 @@ const initialState = {
 
   export default function(state = initialState, action) {
     switch (action.type) {
-      case types.REGISTRATION_USER_REQUEST:{
-        state.isFetching = true;
-        return {...state}
+      case types.REGISTRATION_USER_REQUEST:{        
+        return {...state,
+          isFetching: true}
       }
       case types.REGISTRATION_USER_SUCCESS:{
-        state.user = action.data;
-        state.isFetching = false;
         return {...state,
             isFetching: false,
             user: action.data,

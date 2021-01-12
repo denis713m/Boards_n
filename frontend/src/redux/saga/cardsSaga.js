@@ -54,6 +54,11 @@ export function* deleteCard(action) {
         const activity = yield server.deleteCard(action.payload);
         const { card } = yield select();
         const stateCard = card.cards.filter((element) => element.id !== action.payload.card);
+        const deletedCard = _.find(card.cards, { id: action.payload.card });
+        const cardsToDecreaseIndex = stateCard.filter(
+            (element) => element.listId === deletedCard.listId && element.index > deletedCard.index
+        );
+        cardsToDecreaseIndex.forEach((element) => (element.index = element.index - 1));
         yield put({
             type: types.CARD_DELETE_SUCCESS,
             data: stateCard,
@@ -135,7 +140,7 @@ export function* replaceCard(action) {
         const newList = _.find(list.lists, { id: action.payload.newListId }).name;
         const activity = yield server.replaceCard({ ...action.payload, oldList, newList });
         const cardsToDecreaseIndex = card.cards.filter(
-            (card) =>                
+            (card) =>
                 card.listId === action.payload.oldListId &&
                 card.id !== action.payload.cardId &&
                 card.index > action.payload.oldIndex

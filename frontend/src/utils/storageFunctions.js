@@ -163,6 +163,11 @@ export const deleteList = (data) => {
 
 export const deleteCard = (data) => {
     const cards = getCardsFromStorage();
+    const deletedCard = _.find(cards, { id: data.card });
     const newCards = cards.filter((element) => element.id !== data.card);
+    const cardsToDecreaseIndex = newCards.filter(
+        (element) => element.listId === deletedCard.listId && element.index > deletedCard.index
+    );
+    cardsToDecreaseIndex.forEach((element) => (element.index = element.index - 1));
     window.localStorage.setItem('cards', JSON.stringify(newCards));
 };

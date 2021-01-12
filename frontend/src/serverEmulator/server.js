@@ -176,7 +176,7 @@ export default {
     replaceCard: (data) => {
         const cards = getCardsFromStorage();
         const cardsToDecreaseIndex = cards.filter(
-            (card) => data.newListId !== data.oldListId && card.id !== data.cardId && card.index > data.oldIndex
+            (card) => card.listId === data.oldListId && card.id !== data.cardId && card.index > data.oldIndex
         );
         const cardsToIncreaseIndex = cards.filter(
             (card) => card.listId === data.newListId && card.id !== data.cardId && card.index >= data.newIndex

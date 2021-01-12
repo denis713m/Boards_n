@@ -7,9 +7,7 @@ import ERROR_MESSAGES from '../../ERROR_CONSTANTS';
 import server from '../../serverEmulator/server';
 
 export function* createBoards(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
         const { boards } = yield select();
         const boardWithNewName = _.find(boards.boards, { name: action.payload.name });
@@ -49,9 +47,7 @@ export function* getBoards(action) {
 }
 
 export function* getBoardById(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
         const {board, lists, cards, activities} = yield server.getBoardById(action.payload);
         const sortedCards = _.sortBy(cards, ['index']);
@@ -77,9 +73,7 @@ export function* getBoardById(action) {
 }
 
 export function* renameBoard(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
         const { boards } = yield select();
         const boardWithNewName = _.find(boards.boards, { name: action.payload.name });

@@ -30,16 +30,15 @@ import {
 export default {
     registrationUser: (data) => {
         const password = hashPass(data.password);
-        const token = generateTokens(newUser);
         const newUser = {
             firstName: data.firstName,
             lastName: data.lastName,
             displayName: data.displayName,
             email: data.email,
             password: password,
-            token: token,
         };
-        const userId = registerUser(newUser);
+        const token = generateTokens(newUser);
+        const userId = registerUser({ ...newUser, token });
         return { token };
     },
 

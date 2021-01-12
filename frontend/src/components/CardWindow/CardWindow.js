@@ -13,20 +13,14 @@ const CardWindow = (props) => {
     const [isShowDetails, showDetails] = useState(true);
     const [isCreateDescriptionForm, showCreateDescriptionForm] = useState(false);
     const getActivities = () => {
-        const activities = [];
-        props.activities.forEach((item) => {
-            if (item.cardId === props.currentCard.id)
-                activities.push(<Activity key={item.id} item={item} cardWindow={true} />);
-        });
-        return activities;
+        const cardActivities = props.activities.filter((item) => item.cardId === props.currentCard.id);
+        return cardActivities.map((item) => <Activity key={item.id} item={item} cardWindow={true} />);
     };
     const getComments = () => {
-        const comments = [];
-        props.activities.forEach((item) => {
-            if (item.activity.type === ADD_COMMENT && item.cardId === props.currentCard.id)
-                comments.push(<Activity key={item.id} item={item} cardWindow={true} />);
-        });
-        return comments;
+        const cardComments = props.activities.filter(
+            (item) => item.activity.type === ADD_COMMENT && item.cardId === props.currentCard.id
+        );
+        return cardComments.map((item) => <Activity key={item.id} item={item} cardWindow={true} />);
     };
     const saveComment = (values) => {
         props.createComment({

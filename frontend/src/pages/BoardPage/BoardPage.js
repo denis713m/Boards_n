@@ -22,7 +22,7 @@ import TryAgain from '../../components/TryAgain/TryAgain';
 import Error from '../../components/Error/Error';
 
 const BoardPage = (props) => {
-    const params = Number(useParams().id);
+    const params = useParams().id;
     useEffect(() => {
         props.getBoardById(params);
     }, []);

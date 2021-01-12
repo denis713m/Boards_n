@@ -10,8 +10,7 @@ const initialState = {
 export default function (state = initialState, action) {
     switch (action.type) {
         case types.CARD_REQUEST: {
-            state.isFetching = true;
-            return { ...state };
+            return { ...state, isFetching: true };
         }
         case types.CARD_CREATE_SUCCESS: {
             return {

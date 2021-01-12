@@ -40,3 +40,5 @@ export const addDescription = createAction(types.CARD_ADD_DESCRIPTION)
 export const replaceCard = createAction(types.CARD_REPLACE)
 
 export const replaceCardInList = createAction(types.CARD_REPLACE_IN_LIST);
+
+export const clearErrors = createAction(types.CLEAR_ERRORS);

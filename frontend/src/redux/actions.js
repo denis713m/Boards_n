@@ -26,3 +26,19 @@ export const listDelete = createAction(types.LIST_DELETE)
 export const listRename = createAction(types.LIST_RENAME)
 
 export const getListByBoard = createAction(types.GET_LISTS_BY_BOARD)
+
+export const cardCreate = createAction(types.CARD_CREATE)
+
+export const cardDelete = createAction(types.CARD_DELETE)
+
+export const chooseCard = createAction(types.CHOOSE_CARD)
+
+export const createComment = createAction(types.CREATE_COMMENT)
+
+export const addDescription = createAction(types.CARD_ADD_DESCRIPTION)
+
+export const replaceCard = createAction(types.CARD_REPLACE)
+
+export const replaceCardInList = createAction(types.CARD_REPLACE_IN_LIST);
+
+export const clearErrors = createAction(types.CLEAR_ERRORS);

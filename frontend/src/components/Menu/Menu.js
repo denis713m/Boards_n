@@ -1,9 +1,14 @@
 import React from 'react';
-import styles from './Menu.module.sass';
+import { Link, Redirect } from 'react-router-dom';
 import {connect} from 'react-redux';
 import {logOut} from '../../redux/actions';
+import styles from './Menu.module.sass';
 
 const Menu = (props) => {
+    const logOut = () =>{
+        window.localStorage.removeItem('accessToken');
+        props.logOut();
+    }
     return (
         <div className={styles.mainContainer}>
             <div className={styles.menuHeader}>
@@ -11,9 +16,9 @@ const Menu = (props) => {
                 <div className={styles.btnClose} onClick={props.close}> X </div>
             </div>           
             <hr/>
-            <div className={styles.menuItem} onClick={props.logOut}>
+            <Link to={'/login'} className={styles.menuItem} onClick={logOut}>
                 Log out
-                </div> 
+                </Link> 
        
         </div>
     );

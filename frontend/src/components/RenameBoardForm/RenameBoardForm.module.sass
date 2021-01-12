@@ -1,11 +1,11 @@
 .changeContainer
     display: flex
+    align-items: center
 .renameContainer
     position: relative
     width: fill
     display: flex
-    flex-direction: column
-    height: 20px
+    flex-direction: column  
     font-size: 16px
     text-align: center
     border: none
@@ -13,24 +13,26 @@
     outline: none
 .inputfield
     background-color: white
+    width: 120px
     border: none
     border-radius: 4px
-    font-size: 16px
     outline: none
-    margin-bottom: 5px
+    margin-right: 80px
 .fieldWarning
     position: absolute
-    top: 30px
-    left: 10px
+    height: 40px
+    top: -10px
+    left: 120px
     right: 10px
-    font-size: 15px
+    font-size: 12px
+    font-weight: 400
     display: flex
     justify-content: center
-    color: white
-    border: 1px solid #b72522
-    padding-bottom: 5px
-    padding-top: 5px
-    
+    align-items: center
+    color: red
+    padding-bottom: 2px
+    padding-top: 2px
+    z-index: 5
 .btnRenameBoard
     height: 20px
     margin: 0px 10px 0px 10px
@@ -39,3 +41,9 @@
     color: #ffffff
     border: 0
     border-radius: 5px
+.btnResetName
+    width: 50px
+    margin-right: 10px
+    color: #9A9B9D
+    border: none
+    background-color: #0079BE

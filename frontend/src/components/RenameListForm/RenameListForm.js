@@ -18,7 +18,7 @@ const RenameListForm = (props) => {
                     component={FormInput}
                     type='text'
                 />
-                <button type='submit' className={styles.btnRenameBoard}>
+                <button type='submit' className={styles.btnRenameList}>
                     <span className={styles.submitBtn}>Rename</span>
                 </button>
             </form>

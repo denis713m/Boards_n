@@ -1,41 +1,40 @@
 import * as types from '../actionTypes';
 import { put } from 'redux-saga/effects';
-import { v4 as uuidv4 } from 'uuid';
-import { getBoardsFromStorage, getListsFromStorageByBoard } from '../../utils/functions';
+import _ from 'lodash';
+import { select } from 'redux-saga/effects';
+import { stopSubmit } from 'redux-form';
+import ERROR_MESSAGES from '../../ERROR_CONSTANTS';
+import server from '../../serverEmulator/server';
 
 export function* createBoards(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
-        const boards = getBoardsFromStorage();
-        const boardWithNewName = _.find(boards, { name: action.payload.name });
+        const { boards } = yield select();
+        const boardWithNewName = _.find(boards.boards, { name: action.payload.name });
         if (!_.isUndefined(boardWithNewName)) throw new Error('Name exists');
-        const board = {
-            name: action.payload.name,
-            user: action.payload.user,
-            id: uuidv4(),
-        };
-        boards.push(board);
-        window.localStorage.setItem('boards', JSON.stringify(boards));
+        const boardId = yield server.createBoard(action.payload);
         yield put({
             type: types.BOARD_CREATE_SUCCESS,
-            data: board,
+            data: {
+                name: action.payload.name,
+                user: action.payload.user,
+                id: boardId,
+            },
         });
+        action.payload.history.push(`/board/${boardId}`);
     } catch (e) {
+        if (e.message === 'Name exists') yield put(stopSubmit('createBoard', { name: ERROR_MESSAGES.BOARD_EXIST }));
+        else yield put(stopSubmit('createBoard', { name: ERROR_MESSAGES.default }));
         yield put({
             type: types.BOARD_OPERATION_ERROR,
-            error: e,
         });
     }
 }
 
 export function* getBoards(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
-        const boards = getBoardsFromStorage();
+        const boards = server.getBoards();
         yield put({
             type: types.GET_BOARDS_SUCCESS,
             data: boards,
@@ -43,20 +42,19 @@ export function* getBoards(action) {
     } catch (e) {
         yield put({
             type: types.BOARD_OPERATION_ERROR,
-            error: e.response,
         });
     }
 }
 
 export function* getBoardById(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
-        const boards = getBoardsFromStorage();
-        const board = _.find(boards, { id: action.payload });
-        if (_.isUndefined(board)) throw new Error('Board_absend');
-        const lists = getListsFromStorageByBoard(action.payload);
+        const {board, lists, cards, activities} = yield server.getBoardById(action.payload);
+        const sortedCards = _.sortBy(cards, ['index']);
+        yield put({
+            type: types.GET_CARDS_BY_BOARD_SUCCESS,
+            data: sortedCards,
+        });
         yield put({
             type: types.GET_LISTS_BY_BOARD_SUCCESS,
             data: lists,
@@ -64,59 +62,55 @@ export function* getBoardById(action) {
         yield put({
             type: types.GET_BOARD_BY_ID_SUCCESS,
             data: board,
+            activities: activities,
         });
     } catch (e) {
         yield put({
             type: types.BOARD_OPERATION_ERROR,
-            error: e.response,
+            error: e.message === 'Board_absend' ? ERROR_MESSAGES.BOARD_ABSEND : ERROR_MESSAGES.default,
         });
     }
 }
 
 export function* renameBoard(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
         const { boards } = yield select();
         const boardWithNewName = _.find(boards.boards, { name: action.payload.name });
         if (!_.isUndefined(boardWithNewName)) throw new Error('Name exists');
         const board = _.find([...boards.boards, boards.currentBoard], { id: action.payload.id, user: action.payload.author });
+        if (_.isUndefined(board)) throw new Error('NO_RIGHTS');
+        yield server.renameBoard(action.payload);
         board.name = action.payload.name;
-        window.localStorage.setItem('boards', JSON.stringify(boards));
         yield put({
             type: types.BOARD_RENAME_SUCCESS,
             data: {
                 newName: action.payload.name,
-                boards: boards,
+                boards: boards.boards,
             },
         });
+        action.payload.showRenameForm(false);
     } catch (e) {
+        if (e.message === 'Name exists') yield put(stopSubmit('renameBoard', { name: ERROR_MESSAGES.BOARD_EXIST }));
+        else if (e.message === 'NO_RIGHTS') yield put(stopSubmit('renameBoard', { name: ERROR_MESSAGES.NO_RIGHTS }));
+        else yield put(stopSubmit('renameBoard', { name: ERROR_MESSAGES.default }));
         yield put({
             type: types.BOARD_OPERATION_ERROR,
-            error: e.response,
         });
     }
 }
 
 export function* deleteBoard(action) {
-    yield put({
-        type: types.BOARD_REQUEST,
-    });
+    yield put({ type: types.BOARD_REQUEST });
     try {
-        const boards = getBoardsFromStorage();
-        const newBoards = boards.filter(
-            (element) => element.id !== action.payload.id || element.user !== action.payload.author
-        );
-        if (newBoards.length === boards.length) throw new Error('Yoy cant delete this board');
-        window.localStorage.setItem('boards', JSON.stringify(newBoards));
+        const { boards } = yield select();
+        const board = _.find([...boards.boards, boards.currentBoard], { id: action.payload.id, user: action.payload.author });
+        if (_.isUndefined(board)) throw new Error('NO_RIGHTS');
+        yield server.deleteBoard(action.payload);
         action.payload.history.replace('/');
         yield put({
             type: types.BOARD_DELETE_SUCCESS,
-            data: {
-                boards: boards,
-            },
-        });
+         });
     } catch (e) {
         yield put({
             type: types.BOARD_OPERATION_ERROR,

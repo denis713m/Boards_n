@@ -13,6 +13,7 @@ export function* registrationUser(action) {
             userId: data.id,
             lastName: action.payload.values.lastName,
             displayName: action.payload.values.displayName,
+            email: action.payload.values.email,
         }});
     }
     catch (e) {

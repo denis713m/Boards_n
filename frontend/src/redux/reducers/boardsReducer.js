@@ -5,6 +5,7 @@ const initialState = {
     error: false,
     boards: [],
     currentBoard: {},
+    activities: [],
 };
 
 export default function (state = initialState, action) {
@@ -19,7 +20,13 @@ export default function (state = initialState, action) {
             return { ...state, isFetching: false, boards: [...action.data], error: null };
         }
         case types.GET_BOARD_BY_ID_SUCCESS: {
-            return { ...state, isFetching: false, currentBoard: action.data, error: null };
+            return {
+                ...state,
+                isFetching: false,
+                currentBoard: action.data,
+                activities: action.activities,
+                error: null,
+            };
         }
         case types.BOARD_RENAME_SUCCESS: {
             return {
@@ -31,7 +38,19 @@ export default function (state = initialState, action) {
             };
         }
         case types.BOARD_DELETE_SUCCESS: {
-            return { ...state, isFetching: false, currentBoard: {}, boards: [...action.data.boards], error: null };
+            return { ...state, isFetching: false, currentBoard: {}, boards: [], error: null };
+        }
+        case types.LIST_CREATE_SUCCESS:
+        case types.LIST_DELETE_SUCCESS:
+        case types.LIST_RENAME_SUCCESS:
+        case types.CARD_CREATE_SUCCESS:
+        case types.CARD_DELETE_SUCCESS:
+        case types.ADD_COMMENT_SUCCESS:
+        case types.CARD_REPLACE_SUCCESS: {
+            return {
+                ...state,
+                activities: [action.activity, ...state.activities],
+            };
         }
         case types.BOARD_OPERATION_ERROR: {
             return {

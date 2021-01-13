@@ -21,6 +21,9 @@ const RenameBoardForm = (props) => {
                 <button type='submit' className={styles.btnRenameBoard}>
                     <span className={styles.submitBtn}>Rename</span>
                 </button>
+                <button className={styles.btnResetName} onClick={props.close}>
+                    X
+                </button>
             </form>
 
 
@@ -36,7 +39,7 @@ function mapStateToProps(state, ownProps) {
 
 export default connect(mapStateToProps)( reduxForm({
     form: 'renameBoard',
-    enableReinitialize: true,
+    //enableReinitialize: true,
     mapStateToProps,
     validate: customValidator(Schems.CreateBoardSchem)
 })(RenameBoardForm));

@@ -1,8 +1,9 @@
-import {takeLatest, takeLeading, takeEvery} from 'redux-saga/effects';
+import { takeLatest, takeEvery } from 'redux-saga/effects';
 import * as types from '../actionTypes';
-import {registrationUser, login, getUser} from './userSaga';
-import {createBoards, getBoards, getBoardById, renameBoard, deleteBoard} from './boardsSaga';
-import {createList, deleteList, renameList} from './listsSaga';
+import { registrationUser, login, getUser } from './userSagaStorage';
+import { createBoards, getBoards, getBoardById, renameBoard, deleteBoard } from './boardsSaga';
+import { createList, deleteList, renameList } from './listsSaga';
+import { createCard, deleteCard, createComment, addDescription, replaceCard, replaceCardInList } from './cardsSaga';
 
 function* rootSaga() {
     yield takeLatest(types.REGISTRATION_USER, registrationUser);
@@ -16,6 +17,12 @@ function* rootSaga() {
     yield takeLatest(types.LIST_CREATE, createList);
     yield takeLatest(types.LIST_DELETE, deleteList);
     yield takeLatest(types.LIST_RENAME, renameList);
-  }
-  
-  export default rootSaga;
+    yield takeLatest(types.CARD_CREATE, createCard);
+    yield takeLatest(types.CARD_DELETE, deleteCard);
+    yield takeEvery(types.CREATE_COMMENT, createComment);
+    yield takeLatest(types.CARD_ADD_DESCRIPTION, addDescription);
+    yield takeEvery(types.CARD_REPLACE, replaceCard);
+    yield takeEvery(types.CARD_REPLACE_IN_LIST, replaceCardInList);
+}
+
+export default rootSaga;
